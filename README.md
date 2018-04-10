@@ -1,1 +1,5 @@
 # libcc
+
+bag
+stack
+queue
