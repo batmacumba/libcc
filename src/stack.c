@@ -96,7 +96,7 @@ void *Stack_peek(Stack *s) {
 }
 
 /**
- * Returns an array of pointers to all the items on the stack.
+ * Copies all the items on the stack and returns an array of items.
  */
 void **Stack_iterator(Stack *s) {
     if (Stack_isEmpty(s) == 1) {
@@ -131,8 +131,7 @@ int main() {
     tmp = 3;
     Stack_push(stack, tmp);
 
-    int **stack_items = malloc(sizeof(void*) * Stack_size(stack));
-    stack_items = (int**) Stack_iterator(stack);
+    int **stack_items = (int**) Stack_iterator(stack);
     for (int i = 0; i < Stack_size(stack); i++) {
         printf("item %d = %d\n", i, stack_items[i]);
     }

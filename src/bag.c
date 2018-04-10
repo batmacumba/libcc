@@ -71,7 +71,7 @@ void Bag_add(Bag *s, void *new_data) {
 }
 
 /**
- * Returns an array of pointers to all the items on the bag.
+ * Copies all the items in the bag and returns an array of items.
  */
 void **Bag_iterator(Bag *s) {
     if (Bag_isEmpty(s) == 1) {
@@ -96,8 +96,7 @@ int main() {
     Bag_add(bag, "teste2");
     Bag_add(bag, "teste1");
     
-    int **bag_items = malloc(sizeof(void*) * Bag_size(bag));
-    bag_items = (int**) Bag_iterator(bag);
+    char **bag_items = (char**) Bag_iterator(bag);
     for (int i = 0; i < Bag_size(bag); i++) {
         printf("item %d = %s\n", i, bag_items[i]);
     }
