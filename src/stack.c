@@ -123,9 +123,14 @@ int main() {
     printf("retorno = %s\n", Stack_pop(stack));
     printf("retorno = %s\n", Stack_pop(stack));
     printf("retorno = %s\n", Stack_pop(stack));
-    Stack_push(stack, 3);
-    Stack_push(stack, 2);
-    Stack_push(stack, 1);
+    void *tmp = malloc(sizeof(*tmp));
+    tmp = 1;
+    Stack_push(stack, tmp);
+    tmp = 2;
+    Stack_push(stack, tmp);
+    tmp = 3;
+    Stack_push(stack, tmp);
+
     int **stack_items = malloc(sizeof(void*) * Stack_size(stack));
     stack_items = (int**) Stack_iterator(stack);
     for (int i = 0; i < Stack_size(stack); i++) {

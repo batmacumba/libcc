@@ -17,7 +17,7 @@
 typedef struct Stack Stack;									
 
 /* FUNCTIONS */
-Stack *stack_new();
+Stack *Stack_new();
 int Stack_isEmpty(Stack *s);
 int Stack_size(Stack *s);
 void Stack_push(Stack *s, void *new_data);
