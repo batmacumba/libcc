@@ -1,19 +1,14 @@
 /******************************************************************************
- *  Compilation:
- *  Execution:
- *  Dependencies:
- *  Data files:
- *
- *
- *
- *
+ *  Compilation(test): gcc queue.c -o queue
+ *  Execution(test): ./queue
+ *  Dependencies: none
  ******************************************************************************/
 
 /* ifndef guard */
 #ifndef _QUEUE_H_
 #define _QUEUE_H_
 
-/* DATA STRUCTURES */
+/* DATA STRUCTURE */
 typedef struct Queue Queue;
 
 /* FUNCTIONS */

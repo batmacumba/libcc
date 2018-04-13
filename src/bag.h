@@ -1,19 +1,14 @@
 /******************************************************************************
- *  Compilation:
- *  Execution:
- *  Dependencies:
- *  Data files:
- *
- *
- *
- *
+ *  Compilation(test): gcc bag.c -o bag
+ *  Execution(test): ./bag
+ *  Dependencies: none
  ******************************************************************************/
 
 /* ifndef guard */
 #ifndef _BAG_H_
 #define _BAG_H_
 
-/* DATA STRUCTURES */
+/* DATA STRUCTURE */
 typedef struct Bag Bag;
 
 /* FUNCTIONS */

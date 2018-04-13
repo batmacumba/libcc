@@ -1,19 +1,14 @@
 /******************************************************************************
- *  Compilation:
- *  Execution:
- *  Dependencies:
- *  Data files:
- *
- *
- *
- *
+ *  Compilation(test): gcc stack.c -o stack
+ *  Execution(test): ./stack
+ *  Dependencies: none
  ******************************************************************************/
 
 /* ifndef guard */
 #ifndef _STACK_H_
 #define _STACK_H_
 
-/* DATA STRUCTURES */
+/* DATA STRUCTURE */
 typedef struct Stack Stack;									
 
 /* FUNCTIONS */

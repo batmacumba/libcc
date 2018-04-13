@@ -1,4 +1,4 @@
-/* includes e macros */
+/* includes & macros */
 #include <stdio.h>
 #include <stdlib.h>
 #include "bag.h"
