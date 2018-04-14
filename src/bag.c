@@ -90,7 +90,7 @@ void **Bag_iterator(Bag *s) {
 }
 
 /* test */
-int main() {
+void  Bag_unitTest() {
     Bag *bag = Bag_new();
     int *pointer;
     int tmp1 = 1;
@@ -102,11 +102,9 @@ int main() {
     Bag_add(bag, pointer);
     pointer = &tmp3;
     Bag_add(bag, pointer);
-    
+
     int **bag_items = (int**) Bag_iterator(bag);
     for (int i = 0; i < Bag_size(bag); i++) {
         printf("item %d = %d\n", i, *bag_items[i]);
     }
-    return 0;
 }
-

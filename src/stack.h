@@ -9,7 +9,7 @@
 #define _STACK_H_
 
 /* DATA STRUCTURE */
-typedef struct Stack Stack;									
+typedef struct Stack Stack;
 
 /* FUNCTIONS */
 Stack *Stack_new();
@@ -19,5 +19,6 @@ void Stack_push(Stack *s, void *new_data);
 void *Stack_pop(Stack *s);
 void *Stack_peek(Stack *s);
 void **Stack_iterator(Stack *s);
+void Stack_unitTest();
 
 #endif /* _STACK_H_ */

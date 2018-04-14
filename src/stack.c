@@ -115,7 +115,7 @@ void **Stack_iterator(Stack *s) {
 }
 
 /* test */
-int main() {
+void Stack_unitTest() {
     Stack *stack = Stack_new();
     Stack_push(stack, "teste3");
     Stack_push(stack, "teste2");
@@ -123,6 +123,4 @@ int main() {
     printf("retorno = %s\n", Stack_pop(stack));
     printf("retorno = %s\n", Stack_pop(stack));
     printf("retorno = %s\n", Stack_pop(stack));
-
-    return 0;
 }

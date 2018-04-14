@@ -119,7 +119,7 @@ void **Queue_iterator(Queue *s) {
 }
 
 /* test */
-int main() {
+int Queue_unitTest() {
     Queue *queue = Queue_new();
     Queue_enqueue(queue, "teste1");
     Queue_enqueue(queue, "teste2");
@@ -127,6 +127,4 @@ int main() {
     printf("retorno = %s\n", Queue_dequeue(queue));
     printf("retorno = %s\n", Queue_dequeue(queue));
     printf("retorno = %s\n", Queue_dequeue(queue));
-
-    return 0;
 }
