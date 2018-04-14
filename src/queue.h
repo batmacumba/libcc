@@ -17,6 +17,6 @@ void Queue_enqueue(Queue *s, void *new_data);
 void *Queue_dequeue(Queue *s);
 void *Queue_peek(Queue *s);
 void **Queue_iterator(Queue *s);
-int Queue_unitTest();
+void Queue_unitTest();
 
 #endif /* _QUEUE_H_ */

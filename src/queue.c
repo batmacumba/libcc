@@ -119,7 +119,7 @@ void **Queue_iterator(Queue *s) {
 }
 
 /* test */
-int Queue_unitTest() {
+void Queue_unitTest() {
     Queue *queue = Queue_new();
     Queue_enqueue(queue, "teste1");
     Queue_enqueue(queue, "teste2");
