@@ -66,6 +66,7 @@ int Vector_popBack(Vector *v) {
         fprintf(stderr, "Vector_popBack: vector is already empty!\n");
         return 1;
     }
+    free(v->items[v->size - 1]);
     v->size--;
     return 0;
 }
@@ -74,29 +75,33 @@ int Vector_popBack(Vector *v) {
  * Destroys a vector, freeing all the allocated memory it is using
  */
 void Vector_destroy(Vector *v) {
-        free(v->items);
-        free(v);
-        v = NULL;
+    for(int i = 0; i < v->size; i++)
+        free(v->items[i]);
+    free(v->items);
+    free(v);
+    v = NULL;
 }
 
 void Vector_unitTest() {
     Vector *v = Vector_new();
-    int *pointer;
-    int tmp1 = 1;
-    int tmp2 = 2;
-    int tmp3 = 3;
-    int tmp4 = 4;
-    int tmp5 = 5;
-    pointer = &tmp1;
-    Vector_pushBack(v, pointer);
-    pointer = &tmp2;
-    Vector_pushBack(v, pointer);
-    pointer = &tmp3;
-    Vector_pushBack(v, pointer);
-    pointer = &tmp4;
-    Vector_pushBack(v, pointer);
-    pointer = &tmp5;
-    Vector_pushBack(v, pointer);
+
+    int *tmp1 = (int*)malloc(sizeof(int));
+    int *tmp2 = (int*)malloc(sizeof(int));
+    int *tmp3 = (int*)malloc(sizeof(int));
+    int *tmp4 = (int*)malloc(sizeof(int));
+    int *tmp5 = (int*)malloc(sizeof(int));
+
+    *tmp1 = 1;
+    *tmp2 = 2;
+    *tmp3 = 3;
+    *tmp4 = 4;
+    *tmp5 = 5;
+
+    Vector_pushBack(v, tmp1);
+    Vector_pushBack(v, tmp2);
+    Vector_pushBack(v, tmp3);
+    Vector_pushBack(v, tmp4);
+    Vector_pushBack(v, tmp5);
 
     printf("After 5 pushBack calls: \n");
     printf("Size: %d\n", v->size);
