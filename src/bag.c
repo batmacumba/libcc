@@ -22,7 +22,7 @@ struct Bag {
 Bag *Bag_new() {
     Bag *s = (Bag*) malloc(sizeof(Bag));
     if (!s) {
-        fprintf(stderr, "Cannot create new bag!\n");
+        fprintf(stderr, "Bag_new: Cannot create new bag!\n");
         return NULL;
     }
     s -> top = NULL;
@@ -51,7 +51,7 @@ int Bag_size(Bag *s) {
 Item *Item_new() {
     Item *i = (Item*) malloc(sizeof(Item));
     if (!i) {
-        fprintf(stderr, "Cannot create new item!\n");
+        fprintf(stderr, "Item_new: Cannot create new item!\n");
         return NULL;
     }
     i -> data = NULL;
@@ -75,7 +75,7 @@ void Bag_add(Bag *s, void *new_data) {
  */
 void **Bag_iterator(Bag *s) {
     if (Bag_isEmpty(s) == 1) {
-        fprintf(stderr, "Bag is empty!\n");
+        fprintf(stderr, "Bag_iterator: Bag is empty!\n");
         return NULL;
     }
     void **bag_items = (malloc(sizeof(void*) * s -> size));
