@@ -17,7 +17,7 @@ void Bag_add(Bag *b, void *data, size_t dataSize);
 void **Bag_iterator(Bag *b);
 void  Bag_unitTest();
 
-// You can use this macro to avoid typing sizeof:
-// #define Bag_add(b, data) Bag_add(b, data, sizeof(data))
+// Macro to avoid typing sizeof:
+#define Bag_add(b, data) Bag_add(b, data, sizeof(data))
 
 #endif /* _BAG_H_ */

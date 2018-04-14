@@ -4,6 +4,8 @@
 #include <string.h>
 #include "bag.h"
 
+#undef Bag_add
+
 /* bag implementation (hidden from clients) */
 typedef struct Item {
     void *data;
