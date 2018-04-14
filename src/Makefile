@@ -9,3 +9,6 @@ stack.o: stack.c
 	$(CC) $(CCFLAGS) -c $< -o $@
 vector.o: vector.c
 	$(CC) $(CCFLAGS) -c $< -o $@
+
+clean:
+	rm *.o
