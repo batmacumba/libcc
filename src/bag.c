@@ -92,13 +92,20 @@ void **Bag_iterator(Bag *s) {
 /* test */
 int main() {
     Bag *bag = Bag_new();
-    Bag_add(bag, "teste3");
-    Bag_add(bag, "teste2");
-    Bag_add(bag, "teste1");
+    int *pointer;
+    int tmp1 = 1;
+    int tmp2 = 2;
+    int tmp3 = 3;
+    pointer = &tmp1;
+    Bag_add(bag, pointer);
+    pointer = &tmp2;
+    Bag_add(bag, pointer);
+    pointer = &tmp3;
+    Bag_add(bag, pointer);
     
-    char **bag_items = (char**) Bag_iterator(bag);
+    int **bag_items = (int**) Bag_iterator(bag);
     for (int i = 0; i < Bag_size(bag); i++) {
-        printf("item %d = %s\n", i, bag_items[i]);
+        printf("item %d = %d\n", i, *bag_items[i]);
     }
     return 0;
 }

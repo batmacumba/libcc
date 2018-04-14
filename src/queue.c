@@ -127,17 +127,6 @@ int main() {
     printf("retorno = %s\n", Queue_dequeue(queue));
     printf("retorno = %s\n", Queue_dequeue(queue));
     printf("retorno = %s\n", Queue_dequeue(queue));
-    void *tmp = malloc(sizeof(*tmp));
-    tmp = 1;
-    Queue_enqueue(queue, tmp);
-    tmp = 2;
-    Queue_enqueue(queue, tmp);
-    tmp = 3;
-    Queue_enqueue(queue, tmp);
-    
-    int **queue_items = (int**) Queue_iterator(queue);
-    for (int i = 0; i < Queue_size(queue); i++) {
-        printf("item %d = %d\n", i, queue_items[i]);
-    }
+
     return 0;
 }
