@@ -23,7 +23,7 @@ struct Queue {
 Queue *Queue_new() {
     Queue *s = (Queue*) malloc(sizeof(Queue));
     if (!s) {
-        fprintf(stderr, "Cannot create new queue!\n");
+        fprintf(stderr, "Queue_new: Cannot create new queue!\n");
         return NULL;
     }
     s -> first = NULL;
@@ -53,7 +53,7 @@ int Queue_size(Queue *s) {
 Item *Item_new() {
     Item *i = (Item*) malloc(sizeof(Item));
     if (!i) {
-        fprintf(stderr, "Cannot create new item!\n");
+        fprintf(stderr, "Item_new: Cannot create new item!\n");
         return NULL;
     }
     i -> data = NULL;
@@ -78,7 +78,7 @@ void Queue_enqueue(Queue *s, void *new_data) {
  */
 void *Queue_dequeue(Queue *s) {
     if (Queue_isEmpty(s) == 1) {
-        fprintf(stderr, "Queue is empty!\n");
+        fprintf(stderr, "Queue_dequeue: Queue is empty!\n");
         return NULL;
     }
     void *data = s -> first -> data;
@@ -93,7 +93,7 @@ void *Queue_dequeue(Queue *s) {
  */
 void *Queue_peek(Queue *s) {
     if (Queue_isEmpty(s) == 1) {
-        fprintf(stderr, "Queue is empty!\n");
+        fprintf(stderr, "Queue_peek: Queue is empty!\n");
         return NULL;
     }
     return s -> first -> data;
@@ -104,7 +104,7 @@ void *Queue_peek(Queue *s) {
  */
 void **Queue_iterator(Queue *s) {
     if (Queue_isEmpty(s) == 1) {
-        fprintf(stderr, "Queue is empty!\n");
+        fprintf(stderr, "Queue_iterator: Queue is empty!\n");
         return NULL;
     }
     void **queue_items = (malloc(sizeof(void*) * s -> size));
@@ -119,7 +119,7 @@ void **Queue_iterator(Queue *s) {
 }
 
 /* test */
-int main() {
+int Queue_unitTest() {
     Queue *queue = Queue_new();
     Queue_enqueue(queue, "teste1");
     Queue_enqueue(queue, "teste2");
@@ -127,6 +127,4 @@ int main() {
     printf("retorno = %s\n", Queue_dequeue(queue));
     printf("retorno = %s\n", Queue_dequeue(queue));
     printf("retorno = %s\n", Queue_dequeue(queue));
-
-    return 0;
 }

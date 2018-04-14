@@ -1,12 +1,16 @@
 # libcc
 
-Biblioteca de algoritmos e estruturas de dados em C.
+Biblioteca de algoritmos e estruturas de dados em C.  
 
 ## Como usar
 
-Baixe os arquivos .h e .c para o diretório e inclua o .h.
-
+Na pasta /src, rode o comando:  
+```bash
+$make <nome da estrutura>.o
 ```
-Ex:
+Isso gerará o código objeto <nome da estrutura>.o que pode ser incluido na compilação do seu projeto pessoal.  
+Além disso, inclua o arquivo header da estrutura desejada.  
+Ex:  
+```
 #include "bag.h"
 ```

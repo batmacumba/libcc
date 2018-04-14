@@ -22,7 +22,7 @@ struct Stack {
 Stack *Stack_new() {
     Stack *s = (Stack*) malloc(sizeof(Stack));
     if (!s) {
-        fprintf(stderr, "Cannot create new stack!\n");
+        fprintf(stderr, "Stack_new: Cannot create new stack!\n");
         return NULL;
     }
     s -> top = NULL;
@@ -51,7 +51,7 @@ int Stack_size(Stack *s) {
 Item *Item_new() {
     Item *i = (Item*) malloc(sizeof(Item));
     if (!i) {
-        fprintf(stderr, "Cannot create new item!\n");
+        fprintf(stderr, "Item_new: Cannot create new item!\n");
         return NULL;
     }
     i -> data = NULL;
@@ -75,7 +75,7 @@ void Stack_push(Stack *s, void *new_data) {
  */
 void *Stack_pop(Stack *s) {
     if (Stack_isEmpty(s) == 1) {
-        fprintf(stderr, "Stack is empty!\n");
+        fprintf(stderr, "Stack_pop: Stack is empty!\n");
         return NULL;
     }
     void *data = s -> top -> data;
@@ -89,7 +89,7 @@ void *Stack_pop(Stack *s) {
 */
 void *Stack_peek(Stack *s) {
     if (Stack_isEmpty(s) == 1) {
-        fprintf(stderr, "Stack is empty!\n");
+        fprintf(stderr, "Stack_peek: Stack is empty!\n");
         return NULL;
     }
     return s -> top -> data;
@@ -100,7 +100,7 @@ void *Stack_peek(Stack *s) {
  */
 void **Stack_iterator(Stack *s) {
     if (Stack_isEmpty(s) == 1) {
-        fprintf(stderr, "Stack is empty!\n");
+        fprintf(stderr, "Stack_iterator: Stack is empty!\n");
         return NULL;
     }
     void **stack_items = (malloc(sizeof(void*) * s -> size));
@@ -115,7 +115,7 @@ void **Stack_iterator(Stack *s) {
 }
 
 /* test */
-int main() {
+void Stack_unitTest() {
     Stack *stack = Stack_new();
     Stack_push(stack, "teste3");
     Stack_push(stack, "teste2");
@@ -123,6 +123,4 @@ int main() {
     printf("retorno = %s\n", Stack_pop(stack));
     printf("retorno = %s\n", Stack_pop(stack));
     printf("retorno = %s\n", Stack_pop(stack));
-
-    return 0;
 }

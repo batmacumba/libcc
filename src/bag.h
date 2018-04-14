@@ -1,6 +1,4 @@
 /******************************************************************************
- *  Compilation(test): gcc bag.c -o bag
- *  Execution(test): ./bag
  *  Dependencies: none
  ******************************************************************************/
 
@@ -17,6 +15,6 @@ int Bag_isEmpty(Bag *s);
 int Bag_size(Bag *s);
 void Bag_add(Bag *s, void *new_data);
 void **Bag_iterator(Bag *s);
+void  Bag_unitTest();
 
 #endif /* _BAG_H_ */
-
