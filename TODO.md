@@ -18,6 +18,6 @@
  - Criar uma função destroy para dar free
  - Adicionar tratamento de erro na função push
 
-##Bag:
+## Bag:
  - Criar uma função destroy para dar free
  - Adicionar tratamento de erro na função add
