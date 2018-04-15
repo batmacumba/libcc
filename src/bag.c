@@ -66,7 +66,7 @@ Item *Item_new(size_t dataSize) {
 }
 
 /*
- * Bag_add():copies the data and adds it to the bag.
+ * Bag_add(): copies the data and adds it to the bag.
  */
 void Bag_add(Bag *b, void *data, size_t dataSize) {
     Item *i = Item_new(dataSize);

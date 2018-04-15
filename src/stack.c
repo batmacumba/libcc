@@ -3,7 +3,10 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "stack.h"
+
+#undef Stack_push
 
 /*
  * Data Structures
@@ -50,25 +53,25 @@ int Stack_size(Stack *s) {
 /*
  * Item_new(): initializes an empty Item.
  */
-Item *Item_new() {
+Item *Item_new(size_t dataSize) {
     Item *i = (Item*) malloc(sizeof(Item));
     if (!i) {
         fprintf(stderr, "Item_new: Cannot create new item!\n");
         return NULL;
     }
-    i -> data = NULL;
+    i -> data = malloc(dataSize);
     i -> next = NULL;
     return i;
 }
 
 /*
- * Stack_push(): adds the item to the stack.
+ * Stack_push(): copies the data and adds the item to the stack.
  */
-void Stack_push(Stack *s, void *new_data) {
-    Item *new_item = Item_new();
-    new_item -> data = new_data;
-    new_item -> next = s -> top;
-    s -> top = new_item;
+void Stack_push(Stack *s, void *data, size_t dataSize) {
+    Item *i = Item_new(dataSize);
+    memcpy(i -> data, data, dataSize);
+    i -> next = s -> top;
+    s -> top = i;
     s -> size++;
 }
 
@@ -121,9 +124,9 @@ void **Stack_iterator(Stack *s) {
  */
 void Stack_unitTest() {
     Stack *stack = Stack_new();
-    Stack_push(stack, "teste3");
-    Stack_push(stack, "teste2");
-    Stack_push(stack, "teste1");
+    Stack_push(stack, "teste3", sizeof("teste3"));
+    Stack_push(stack, "teste2", sizeof("teste2"));
+    Stack_push(stack, "teste1", sizeof("teste1"));
     printf("retorno = %s\n", Stack_pop(stack));
     printf("retorno = %s\n", Stack_pop(stack));
     printf("retorno = %s\n", Stack_pop(stack));
