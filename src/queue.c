@@ -53,12 +53,12 @@ int Queue_size(Queue *q) {
 }
 
 /*
- * Item_new(): initializes an empty Item.
+ * Q_Item_new(): initializes an empty Item.
  */
-Item *Item_new(size_t dataSize) {
+Item *Q_Item_new(size_t dataSize) {
     Item *i = (Item*) malloc(sizeof(Item));
     if (!i) {
-        fprintf(stderr, "Item_new: Cannot create new item!\n");
+        fprintf(stderr, "Q_Item_new: Cannot create new item!\n");
         return NULL;
     }
     i -> data = malloc(dataSize);
@@ -71,7 +71,7 @@ Item *Item_new(size_t dataSize) {
  */
 void Queue_enqueue(Queue *q, void *data, size_t dataSize) {
     Item *old_last = q -> last;
-    q -> last = Item_new(dataSize);
+    q -> last = Q_Item_new(dataSize);
     memcpy(q -> last -> data, data, dataSize);
     if (Queue_isEmpty(q) == 1) q -> first = q -> last;
     else old_last -> next = q -> last;

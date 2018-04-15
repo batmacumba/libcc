@@ -18,7 +18,7 @@ typedef struct Bag Bag;
 Bag *Bag_new();                                         // constructor
 int Bag_isEmpty(Bag *b);                                // is bag empty?
 int Bag_size(Bag *b);                                   // returns bag's size
-void Bag_add(Bag *b, void *data, size_t dataSize);      // adds an item
+int Bag_add(Bag *b, void *data, size_t dataSize);       // adds an item
 void **Bag_iterator(Bag *b);                            // iterator
 void  Bag_unitTest();                                   // test
 

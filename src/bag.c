@@ -22,22 +22,23 @@ struct Bag {
 };
 
 /*
- * Bag_new(): initializes an empty bag and returns a pointer to it.
+ * Bag_new():
+ * Initializes an empty bag and returns a pointer to it.
  */
 Bag *Bag_new() {
     Bag *b = (Bag*) malloc(sizeof(Bag));
     if (!b) {
-        fprintf(stderr, "Bag_new: Cannot create new bag!\n");
+        fprintf(stderr, "Bag_new: cannot create new bag!\n");
         return NULL;
     }
     b -> top = NULL;
     b -> size = 0;
-    
     return b;
 }
 
 /*
- * Bag_isEmpty(): returns 1 if this bag is empty, 0 if it's not.
+ * Bag_isEmpty():
+ * Returns 1 if this bag is empty, 0 if it's not.
  */
 int Bag_isEmpty(Bag *b) {
     if (b -> top == NULL) return 1;
@@ -45,58 +46,73 @@ int Bag_isEmpty(Bag *b) {
 }
 
 /*
- * Bag_size(): returns the number of items on this bag.
+ * Bag_size():
+ * Returns the number of items on this bag.
  */
 int Bag_size(Bag *b) {
     return b -> size;
 }
 
 /*
- * Item_new(): initializes an empty Item.
+ * B_Item_new():
+ * Initializes an empty Item.
  */
-Item *Item_new(size_t dataSize) {
+Item *B_Item_new(size_t dataSize) {
     Item *i = (Item*) malloc(sizeof(Item));
     if (!i) {
-        fprintf(stderr, "Item_new: Cannot create new item!\n");
+        fprintf(stderr, "B_Item_new: cannot malloc new item!\n");
         return NULL;
     }
     i -> data = malloc(dataSize);
+    if (!i -> data) {
+        fprintf(stderr, "B_Item_new: cannot malloc space for data!\n");
+        return NULL;
+    }
     i -> next = NULL;
     return i;
 }
 
 /*
- * Bag_add(): copies the data and adds it to the bag.
+ * Bag_add():
+ * Copies the data and adds it to the bag.
+ * Returns 0 if item was succesfully added or 1 otherwise.
  */
-void Bag_add(Bag *b, void *data, size_t dataSize) {
-    Item *i = Item_new(dataSize);
+int Bag_add(Bag *b, void *data, size_t dataSize) {
+    Item *i = B_Item_new(dataSize);
+    if (i == NULL) {
+        fprintf(stderr, "Bag_add: cannot create new item!\n");
+        return 1;
+    }
     memcpy(i -> data, data, dataSize);
     i -> next = b -> top;
     b -> top = i;
     b -> size++;
+    return 0;
 }
 
 /*
- * Bag_iterator(): copies every item in the bag and returns an array of items.
+ * Bag_iterator():
+ * Copies every item in the bag and returns an array of items.
  */
 void **Bag_iterator(Bag *b) {
     if (Bag_isEmpty(b) == 1) {
-        fprintf(stderr, "Bag_iterator: Bag is empty!\n");
+        fprintf(stderr, "Bag_iterator: bag is empty!\n");
         return NULL;
     }
-    void **bag_items = (malloc(sizeof(void*) * b -> size));
-    Item *current_item = b -> top;
-    int i = 0;
-    while (current_item != NULL) {
-        bag_items[i] = current_item -> data;
-        current_item = current_item -> next;
-        i++;
+    void **items = (malloc(sizeof(void*) * b -> size));
+    Item *i = b -> top;
+    int k = 0;
+    while (k < b -> size) {
+        items[k] = i -> data;
+        i = i -> next;
+        k++;
     }
-    return bag_items;
+    return items;
 }
 
 /*
- * Bag_unitTest(): unit test.
+ * Bag_unitTest():
+ * Unit test.
  */
 void Bag_unitTest() {
     Bag *bag = Bag_new();

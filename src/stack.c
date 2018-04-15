@@ -51,12 +51,12 @@ int Stack_size(Stack *s) {
 }
 
 /*
- * Item_new(): initializes an empty Item.
+ * S_Item_new(): initializes an empty Item.
  */
-Item *Item_new(size_t dataSize) {
+Item *S_Item_new(size_t dataSize) {
     Item *i = (Item*) malloc(sizeof(Item));
     if (!i) {
-        fprintf(stderr, "Item_new: Cannot create new item!\n");
+        fprintf(stderr, "S_Item_new: Cannot create new item!\n");
         return NULL;
     }
     i -> data = malloc(dataSize);
@@ -68,7 +68,7 @@ Item *Item_new(size_t dataSize) {
  * Stack_push(): copies the data and adds the item to the stack.
  */
 void Stack_push(Stack *s, void *data, size_t dataSize) {
-    Item *i = Item_new(dataSize);
+    Item *i = S_Item_new(dataSize);
     memcpy(i -> data, data, dataSize);
     i -> next = s -> top;
     s -> top = i;
