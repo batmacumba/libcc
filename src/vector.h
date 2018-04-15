@@ -16,9 +16,14 @@ typedef struct Vector Vector;
  * Available operations
  */
 Vector *Vector_new();                                       // constructor
-int Vector_pushBack(Vector *v, void *new_data);             // pushes an item
+int Vector_pushBack(Vector *v, void *new_data, size_t dataSize);             // pushes an item
 int Vector_popBack(Vector *v);                              // pops an item
 void Vector_destroy(Vector *v);                             // free
 void Vector_unitTest();                                     // test
+
+/* Let's avoid having to pass sizeof(x) as argument every time we add something.
+ * Instead write Vector_pushBack(v, data) and this macro will expand sizeof.
+ */
+#define Vector_pushBack(v, data) Vector_pushBack(v, data, sizeof(data))
 
 #endif /* _VECTOR_H_ */

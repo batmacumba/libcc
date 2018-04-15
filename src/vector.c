@@ -3,7 +3,10 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "vector.h"
+
+#undef Vector_pushBack
 
 /*
  * Data Structures
@@ -51,14 +54,15 @@ int Vector_resize(Vector *v, int new_size)
  * Adds the item to the end of the vector.
  * Returns 0 if item was succesfully added and 1 otherwise.
  */
-int Vector_pushBack(Vector *v, void *new_data) {
+int Vector_pushBack(Vector *v, void *data, size_t dataSize) {
     if(v->size == v->capacity) {
         if (Vector_resize(v, 2*v->capacity)) {
             fprintf(stderr, "Vector_pushBack: Cannot append to vector!\n");
             return 1;
         }
     }
-    v->items[v->size++] = new_data;
+    v->items[v->size] = malloc(dataSize);
+    memcpy(v->items[v->size++], data, dataSize);
     return 0;
 }
 
@@ -91,6 +95,7 @@ void Vector_destroy(Vector *v) {
  * Unit test.
  */
 void Vector_unitTest() {
+    
     Vector *v = Vector_new();
 
     int *tmp1 = (int*)malloc(sizeof(int));
@@ -105,12 +110,19 @@ void Vector_unitTest() {
     *tmp4 = 4;
     *tmp5 = 5;
 
-    Vector_pushBack(v, tmp1);
-    Vector_pushBack(v, tmp2);
-    Vector_pushBack(v, tmp3);
-    Vector_pushBack(v, tmp4);
-    Vector_pushBack(v, tmp5);
-
+    Vector_pushBack(v, tmp1, sizeof(tmp1));
+    Vector_pushBack(v, tmp2, sizeof(tmp2));
+    Vector_pushBack(v, tmp3, sizeof(tmp3));
+    Vector_pushBack(v, tmp4, sizeof(tmp4));
+    Vector_pushBack(v, tmp5, sizeof(tmp5));
+    
+    /* changing values externally doesn't change the value inside the vector */
+    *tmp1 = 99;
+    *tmp2 = 99;
+    *tmp3 = 99;
+    *tmp4 = 99;
+    *tmp5 = 99;
+    
     printf("After 5 pushBack calls: \n");
     printf("Size: %d\n", v->size);
     printf("Capacity: %d\n", v->capacity);
