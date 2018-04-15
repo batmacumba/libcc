@@ -1,9 +1,13 @@
-/* includes & macros */
+/*
+ * Includes & Macros
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include "queue.h"
 
-/* queue implementation (hidden from clients) */
+/*
+ * Data Structures
+ */
 typedef struct Item {
     void *data;
     struct Item *next;
@@ -15,10 +19,8 @@ struct Queue {
     int size;
 };
 
-/* functions */
-
-/**
- * Initializes an empty queue and returns a pointer to it.
+/*
+ * Queue_new(): initializes an empty queue and returns a pointer to it.
  */
 Queue *Queue_new() {
     Queue *s = (Queue*) malloc(sizeof(Queue));
@@ -32,23 +34,23 @@ Queue *Queue_new() {
     return s;
 }
 
-/**
- * Returns 1 if this queue is empty, 0 if it's not.
+/*
+ * Queue_isEmpty(): returns 1 if this queue is empty, 0 if it's not.
  */
 int Queue_isEmpty(Queue *s) {
     if (s -> first == NULL) return 1;
     else return 0;
 }
 
-/**
- * Returns the number of items on this queue.
+/*
+ * Queue_size(): returns the number of items on this queue.
  */
 int Queue_size(Queue *s) {
     return s -> size;
 }
 
-/**
- * Initializes an empty Item.
+/*
+ * Item_new(): initializes an empty Item.
  */
 Item *Item_new() {
     Item *i = (Item*) malloc(sizeof(Item));
@@ -61,8 +63,8 @@ Item *Item_new() {
     return i;
 }
 
-/**
- * Adds the item to the end of the queue.
+/*
+ * Queue_enqueue(): adds the item to the end of the queue.
  */
 void Queue_enqueue(Queue *s, void *new_data) {
     Item *old_last = s -> last;
@@ -73,8 +75,8 @@ void Queue_enqueue(Queue *s, void *new_data) {
     s -> size++;
 }
 
-/**
- * Removes the item from the first spot and returns it.
+/*
+ * Queue_dequeue(): removes the item from the first spot and returns it.
  */
 void *Queue_dequeue(Queue *s) {
     if (Queue_isEmpty(s) == 1) {
@@ -88,8 +90,8 @@ void *Queue_dequeue(Queue *s) {
     return data;
 }
 
-/**
- * Returns the item on the first spot of the queue without removing it.
+/*
+ * Queue_peek(): returns the item on the first spot of the queue w/o removing
  */
 void *Queue_peek(Queue *s) {
     if (Queue_isEmpty(s) == 1) {
@@ -100,7 +102,7 @@ void *Queue_peek(Queue *s) {
 }
 
 /**
- * Copies all the items on the queue and returns an array of items.
+ * Queue_iterator(): copies all the items on the queue and returns an array.
  */
 void **Queue_iterator(Queue *s) {
     if (Queue_isEmpty(s) == 1) {
@@ -118,7 +120,9 @@ void **Queue_iterator(Queue *s) {
     return queue_items;
 }
 
-/* test */
+/*
+ * Queue_unitTest(): unit test.
+ */
 void Queue_unitTest() {
     Queue *queue = Queue_new();
     Queue_enqueue(queue, "teste1");

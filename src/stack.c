@@ -1,9 +1,13 @@
-/* includes & macros */
+/*
+ * Includes & Macros
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include "stack.h"
 
-/* stack implementation (hidden from clients) */
+/*
+ * Data Structures
+ */
 typedef struct Item {
     void *data;
     struct Item *next;
@@ -14,10 +18,8 @@ struct Stack {
     int size;
 };
 
-/* functions */
-
-/**
- * Initializes an empty stack and returns a pointer to it.
+/*
+ * Stack_new(): initializes an empty stack and returns a pointer to it.
  */
 Stack *Stack_new() {
     Stack *s = (Stack*) malloc(sizeof(Stack));
@@ -30,23 +32,23 @@ Stack *Stack_new() {
     return s;
 }
 
-/**
- * Returns 1 if this stack is empty, 0 if it's not.
+/*
+ * Stack_isEmpty(): returns 1 if this stack is empty, 0 if it's not.
  */
 int Stack_isEmpty(Stack *s) {
     if (s -> top == NULL) return 1;
     else return 0;
 }
 
-/**
- * Returns the number of items on this stack.
+/*
+ * Stack_size(): returns the number of items on this stack.
  */
 int Stack_size(Stack *s) {
     return s -> size;
 }
 
-/**
- * Initializes an empty Item.
+/*
+ * Item_new(): initializes an empty Item.
  */
 Item *Item_new() {
     Item *i = (Item*) malloc(sizeof(Item));
@@ -59,8 +61,8 @@ Item *Item_new() {
     return i;
 }
 
-/**
- * Adds the item to the stack.
+/*
+ * Stack_push(): adds the item to the stack.
  */
 void Stack_push(Stack *s, void *new_data) {
     Item *new_item = Item_new();
@@ -70,8 +72,8 @@ void Stack_push(Stack *s, void *new_data) {
     s -> size++;
 }
 
-/**
- * Removes the item from the top of the stack and returns its content.
+/*
+ * Stack_pop(): removes the item from the top of the stack and returns it.
  */
 void *Stack_pop(Stack *s) {
     if (Stack_isEmpty(s) == 1) {
@@ -84,9 +86,9 @@ void *Stack_pop(Stack *s) {
     return data;
 }
 
-/**
-* Returns the item on the top of the stack without removing it.
-*/
+/*
+ * Stack_peek(): returns the item on the top of the stack without removing it.
+ */
 void *Stack_peek(Stack *s) {
     if (Stack_isEmpty(s) == 1) {
         fprintf(stderr, "Stack_peek: Stack is empty!\n");
@@ -95,8 +97,8 @@ void *Stack_peek(Stack *s) {
     return s -> top -> data;
 }
 
-/**
- * Copies all the items on the stack and returns an array of items.
+/*
+ * Stack_iterator(): copies all the items on the stack and returns an array.
  */
 void **Stack_iterator(Stack *s) {
     if (Stack_isEmpty(s) == 1) {
@@ -114,7 +116,9 @@ void **Stack_iterator(Stack *s) {
     return stack_items;
 }
 
-/* test */
+/*
+ * Stack_unitTest(): unit test.
+ */
 void Stack_unitTest() {
     Stack *stack = Stack_new();
     Stack_push(stack, "teste3");

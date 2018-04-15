@@ -1,4 +1,6 @@
-/* includes & macros */
+/*
+ * Includes & Macros
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,7 +8,9 @@
 
 #undef Bag_add
 
-/* bag implementation (hidden from clients) */
+/*
+ * Data Structures
+ */
 typedef struct Item {
     void *data;
     struct Item *next;
@@ -17,10 +21,8 @@ struct Bag {
     int size;
 };
 
-/* functions */
-
-/**
- * Initializes an empty bag and returns a pointer to it.
+/*
+ * Bag_new(): initializes an empty bag and returns a pointer to it.
  */
 Bag *Bag_new() {
     Bag *b = (Bag*) malloc(sizeof(Bag));
@@ -34,23 +36,23 @@ Bag *Bag_new() {
     return b;
 }
 
-/**
- * Returns 1 if this bag is empty, 0 if it's not.
+/*
+ * Bag_isEmpty(): returns 1 if this bag is empty, 0 if it's not.
  */
 int Bag_isEmpty(Bag *b) {
     if (b -> top == NULL) return 1;
     else return 0;
 }
 
-/**
- * Returns the number of items on this bag.
+/*
+ * Bag_size(): returns the number of items on this bag.
  */
 int Bag_size(Bag *b) {
     return b -> size;
 }
 
-/**
- * Initializes an empty Item.
+/*
+ * Item_new(): initializes an empty Item.
  */
 Item *Item_new(size_t dataSize) {
     Item *i = (Item*) malloc(sizeof(Item));
@@ -63,8 +65,8 @@ Item *Item_new(size_t dataSize) {
     return i;
 }
 
-/**
- * Copies the data and adds it to the bag.
+/*
+ * Bag_add():copies the data and adds it to the bag.
  */
 void Bag_add(Bag *b, void *data, size_t dataSize) {
     Item *i = Item_new(dataSize);
@@ -74,8 +76,8 @@ void Bag_add(Bag *b, void *data, size_t dataSize) {
     b -> size++;
 }
 
-/**
- * Copies all the items in the bag and returns an array of items.
+/*
+ * Bag_iterator(): copies every item in the bag and returns an array of items.
  */
 void **Bag_iterator(Bag *b) {
     if (Bag_isEmpty(b) == 1) {
@@ -93,7 +95,9 @@ void **Bag_iterator(Bag *b) {
     return bag_items;
 }
 
-/* test */
+/*
+ * Bag_unitTest(): unit test.
+ */
 void Bag_unitTest() {
     Bag *bag = Bag_new();
     int *pointer;

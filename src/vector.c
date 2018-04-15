@@ -1,16 +1,21 @@
-/* includes & macros */
+/*
+ * Includes & Macros
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include "vector.h"
 
+/*
+ * Data Structures
+ */
 struct Vector {
     void** items;
     int capacity; //allocated storage capacity
     int size; //number of inserted elements
 };
 
-/**
- * Initializes an empty vector and returns a pointer to it.
+/*
+ * Vector_new(): initializes an empty vector and returns a pointer to it.
  */
 Vector *Vector_new()
 {
@@ -25,7 +30,7 @@ Vector *Vector_new()
     return v;
 }
 
-/**
+/* Vector_resize():
  * Resizes the vector so its capacity is new_size.
  * Returns 0 if item was succesfully resized and 1 otherwise.
  * If resizing is not sucessfull, vector remains unaltered.
@@ -42,7 +47,7 @@ int Vector_resize(Vector *v, int new_size)
     return 0;
 }
 
-/**
+/* Vector_pushBack():
  * Adds the item to the end of the vector.
  * Returns 0 if item was succesfully added and 1 otherwise.
  */
@@ -57,7 +62,7 @@ int Vector_pushBack(Vector *v, void *new_data) {
     return 0;
 }
 
-/**
+/* Vector_popBack():
  * Removes the item at the end of the vector.
  * Returns 0 if item was succesfully removed and 1 otherwise.
  */
@@ -71,8 +76,8 @@ int Vector_popBack(Vector *v) {
     return 0;
 }
 
-/**
- * Destroys a vector, freeing all the allocated memory it is using
+/* Vector_destroy():
+ * Destroys a vector, freeing all the allocated memory it is using.
  */
 void Vector_destroy(Vector *v) {
     for(int i = 0; i < v->size; i++)
@@ -82,6 +87,9 @@ void Vector_destroy(Vector *v) {
     v = NULL;
 }
 
+/* Vector_destroy():
+ * Unit test.
+ */
 void Vector_unitTest() {
     Vector *v = Vector_new();
 
