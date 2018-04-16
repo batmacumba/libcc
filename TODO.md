@@ -3,6 +3,7 @@
 ## Geral:
 - [x] Desconfio que as funções Item_new em queue.c e em stack.c conflitarão em um arquivo que importe ambas as estruturas
 - [ ] Escrever testes completos pras EDs existentes
+- [ ] Escrever documentação completa para as EDs
 
 ## Vector:
 - [ ] Criar uma função isEmpty
