@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Queue: FIFO collection of objects
+ * Queue: FIFO collection of non-unique elements
  * Dependencies: stdio.h, stdlib.h, string.h
  * Compilation:
      $ make queue.o

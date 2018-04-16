@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Bag: collection of objects
+ * Bag: collection of non-unique elements
  * Dependencies: stdio.h, stdlib.h, string.h
  * Compilation:
      $ make bag.o

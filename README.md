@@ -9,8 +9,7 @@ Na pasta /src, rode o comando:
 $make <nome da estrutura>.o
 ```
 Isso gerará o código objeto <nome da estrutura>.o que pode ser incluido na compilação do seu projeto pessoal.  
-Além disso, inclua o arquivo header da estrutura desejada.  
-Ex:  
+Além disso, inclua o arquivo header da estrutura desejada.
 ```
-#include "bag.h"
+#include "<nome da estrutura>.h"
 ```

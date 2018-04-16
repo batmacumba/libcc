@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Stack: LIFO collection of objects
+ * Stack: LIFO collection of non-unique elements
  * Dependencies: stdio.h, stdlib.h, string.h
  * Compilation:
      $ make stack.o
