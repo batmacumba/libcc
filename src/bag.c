@@ -111,10 +111,29 @@ void **Bag_iterator(Bag *b) {
 }
 
 /*
+ * Bag_destroy():
+ * Destroys a bag, freeing all it's allocated memory.
+ */
+void Bag_destroy(Bag *b) {
+    if (!Bag_isEmpty(b)) {
+        Item *i = b -> top;
+        while (i != NULL) {
+            /* top of the bag points to next element */
+            b -> top = i -> next;
+            free(i -> data);
+            free(i);
+            i = b -> top;
+        }
+    }
+    free(b);
+}
+
+/*
  * Bag_unitTest():
  * Unit test.
  */
 void Bag_unitTest() {
+    puts("Bag_unitTest()");
     Bag *bag = Bag_new();
     int *pointer;
     int tmp1 = 1;
@@ -131,5 +150,7 @@ void Bag_unitTest() {
     for (int i = 0; i < Bag_size(bag); i++) {
         printf("item %d = %d\n", i, *bag_items[i]);
     }
+    puts("");
+    Bag_destroy(bag);
 }
 

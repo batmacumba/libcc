@@ -13,12 +13,13 @@
  */
 struct Vector {
     void** items;
-    int capacity; //allocated storage capacity
-    int size; //number of inserted elements
+    int capacity;   //allocated storage capacity
+    int size;       //number of inserted elements
 };
 
 /*
- * Vector_new(): initializes an empty vector and returns a pointer to it.
+ * Vector_new():
+ * Initializes an empty vector and returns a pointer to it.
  */
 Vector *Vector_new()
 {
@@ -33,7 +34,8 @@ Vector *Vector_new()
     return v;
 }
 
-/* Vector_resize():
+/*
+ * Vector_resize():
  * Resizes the vector so its capacity is new_size.
  * Returns 0 if item was succesfully resized and 1 otherwise.
  * If resizing is not sucessfull, vector remains unaltered.
@@ -50,7 +52,8 @@ int Vector_resize(Vector *v, int new_size)
     return 0;
 }
 
-/* Vector_pushBack():
+/*
+ * Vector_pushBack():
  * Adds the item to the end of the vector.
  * Returns 0 if item was succesfully added and 1 otherwise.
  */
@@ -66,7 +69,8 @@ int Vector_pushBack(Vector *v, void *data, size_t dataSize) {
     return 0;
 }
 
-/* Vector_popBack():
+/*
+ * Vector_popBack():
  * Removes the item at the end of the vector.
  * Returns 0 if item was succesfully removed and 1 otherwise.
  */
@@ -80,7 +84,8 @@ int Vector_popBack(Vector *v) {
     return 0;
 }
 
-/* Vector_destroy():
+/*
+ * Vector_destroy():
  * Destroys a vector, freeing all the allocated memory it is using.
  */
 void Vector_destroy(Vector *v) {
@@ -95,7 +100,7 @@ void Vector_destroy(Vector *v) {
  * Unit test.
  */
 void Vector_unitTest() {
-    
+    puts("Vector_unitTest()");
     Vector *v = Vector_new();
 
     int *tmp1 = (int*)malloc(sizeof(int));
@@ -115,13 +120,6 @@ void Vector_unitTest() {
     Vector_pushBack(v, tmp3, sizeof(tmp3));
     Vector_pushBack(v, tmp4, sizeof(tmp4));
     Vector_pushBack(v, tmp5, sizeof(tmp5));
-    
-    /* changing values externally doesn't change the value inside the vector */
-    *tmp1 = 99;
-    *tmp2 = 99;
-    *tmp3 = 99;
-    *tmp4 = 99;
-    *tmp5 = 99;
     
     printf("After 5 pushBack calls: \n");
     printf("Size: %d\n", v->size);
@@ -147,6 +145,6 @@ void Vector_unitTest() {
         printf(", %d", *(int*)(v->items[i]));
     }
     printf("]\n");
-
+    puts("");
     Vector_destroy(v);
 }

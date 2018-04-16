@@ -18,11 +18,12 @@ typedef struct Stack Stack;
 Stack *Stack_new();                                         // constructor
 int Stack_isEmpty(Stack *s);                                // is stack empty?
 int Stack_size(Stack *s);                                   // return stck size
-void Stack_push(Stack *s, void *new_data, size_t dataSize); // pushes an item
+int Stack_push(Stack *s, void *new_data, size_t dataSize);  // pushes an item
 void *Stack_pop(Stack *s);                                  // pops an item
 void *Stack_peek(Stack *s);                                 // returns top item
 void **Stack_iterator(Stack *s);                            // iterator
 void Stack_unitTest();                                      // test
+void Stack_destroy(Stack *s);                               // frees memory
 
 /* Let's avoid having to pass sizeof(x) as argument every time we add something.
  * Instead write Stack_push(s, data) and this macro will expand sizeof.

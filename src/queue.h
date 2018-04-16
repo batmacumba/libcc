@@ -18,11 +18,12 @@ typedef struct Queue Queue;
 Queue *Queue_new();                                         // constructor
 int Queue_isEmpty(Queue *s);                                // is queue empty?
 int Queue_size(Queue *s);                                   // returns q size
-void Queue_enqueue(Queue *q, void *data, size_t dataSize);  // enqueues
+int Queue_enqueue(Queue *q, void *data, size_t dataSize);   // enqueues
 void *Queue_dequeue(Queue *s);                              // dequeues
 void *Queue_peek(Queue *s);                                 // returns head of q
 void **Queue_iterator(Queue *s);                            // iterator
 void Queue_unitTest();                                      // test
+void Queue_destroy(Queue *q);                               // frees memory
 
 /* Let's avoid having to pass sizeof(x) as argument every time we add something.
  * Instead write Queue_enqueue(q, data) and this macro will expand sizeof.

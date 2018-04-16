@@ -22,7 +22,8 @@ struct Stack {
 };
 
 /*
- * Stack_new(): initializes an empty stack and returns a pointer to it.
+ * Stack_new():
+ * Initializes an empty stack and returns a pointer to it.
  */
 Stack *Stack_new() {
     Stack *s = (Stack*) malloc(sizeof(Stack));
@@ -36,7 +37,8 @@ Stack *Stack_new() {
 }
 
 /*
- * Stack_isEmpty(): returns 1 if this stack is empty, 0 if it's not.
+ * Stack_isEmpty():
+ * Returns 1 if this stack is empty, 0 if it's not.
  */
 int Stack_isEmpty(Stack *s) {
     if (s -> top == NULL) return 1;
@@ -44,43 +46,57 @@ int Stack_isEmpty(Stack *s) {
 }
 
 /*
- * Stack_size(): returns the number of items on this stack.
+ * Stack_size():
+ * Returns the number of items on this stack.
  */
 int Stack_size(Stack *s) {
     return s -> size;
 }
 
 /*
- * S_Item_new(): initializes an empty Item.
+ * S_Item_new():
+ * Initializes an empty Item.
  */
 Item *S_Item_new(size_t dataSize) {
     Item *i = (Item*) malloc(sizeof(Item));
     if (!i) {
-        fprintf(stderr, "S_Item_new: Cannot create new item!\n");
+        fprintf(stderr, "S_Item_new: cannot malloc new item!\n");
         return NULL;
     }
     i -> data = malloc(dataSize);
+    if (!i -> data) {
+        fprintf(stderr, "S_Item_new: cannot malloc space for data!\n");
+        return NULL;
+    }
     i -> next = NULL;
     return i;
 }
 
 /*
- * Stack_push(): copies the data and adds the item to the stack.
+ * Stack_push():
+ * Copies the data and adds the item to the stack.
+ * Returns 0 if item was succesfully pushed or 1 otherwise.
  */
-void Stack_push(Stack *s, void *data, size_t dataSize) {
+int Stack_push(Stack *s, void *data, size_t dataSize) {
     Item *i = S_Item_new(dataSize);
+    if (i == NULL) {
+        fprintf(stderr, "Stack_push: cannot create new item!\n");
+        return 1;
+    }
     memcpy(i -> data, data, dataSize);
     i -> next = s -> top;
     s -> top = i;
     s -> size++;
+    return 0;
 }
 
 /*
- * Stack_pop(): removes the item from the top of the stack and returns it.
+ * Stack_pop():
+ * Removes the item from the top of the stack and returns it.
  */
 void *Stack_pop(Stack *s) {
-    if (Stack_isEmpty(s) == 1) {
-        fprintf(stderr, "Stack_pop: Stack is empty!\n");
+    if (Stack_isEmpty(s)) {
+        fprintf(stderr, "Stack_pop: stack is empty!\n");
         return NULL;
     }
     void *data = s -> top -> data;
@@ -90,39 +106,61 @@ void *Stack_pop(Stack *s) {
 }
 
 /*
- * Stack_peek(): returns the item on the top of the stack without removing it.
+ * Stack_peek():
+ * Returns the item on the top of the stack without removing it.
  */
 void *Stack_peek(Stack *s) {
-    if (Stack_isEmpty(s) == 1) {
-        fprintf(stderr, "Stack_peek: Stack is empty!\n");
+    if (Stack_isEmpty(s)) {
+        fprintf(stderr, "Stack_peek: stack is empty!\n");
         return NULL;
     }
     return s -> top -> data;
 }
 
 /*
- * Stack_iterator(): copies all the items on the stack and returns an array.
+ * Stack_iterator():
+ * Copies all the items on the stack and returns an array.
  */
 void **Stack_iterator(Stack *s) {
-    if (Stack_isEmpty(s) == 1) {
-        fprintf(stderr, "Stack_iterator: Stack is empty!\n");
+    if (Stack_isEmpty(s)) {
+        fprintf(stderr, "Stack_iterator: stack is empty!\n");
         return NULL;
     }
-    void **stack_items = (malloc(sizeof(void*) * s -> size));
-    Item *current_item = s -> top;
-    int i = 0;
-    while (current_item != NULL) {
-        stack_items[i] = current_item -> data;
-        current_item = current_item -> next;
-        i++;
+    void **items = (malloc(sizeof(void*) * s -> size));
+    Item *i = s -> top;
+    int k = 0;
+    while (k < s -> size) {
+        items[k] = i -> data;
+        i = i -> next;
+        k++;
     }
-    return stack_items;
+    return items;
 }
 
 /*
- * Stack_unitTest(): unit test.
+ * Stack_destroy():
+ * Destroys a stack, freeing all it's allocated memory.
+ */
+void Stack_destroy(Stack *s) {
+    if (!Stack_isEmpty(s)) {
+        Item *i = s -> top;
+        while (i != NULL) {
+            /* top of the stack points to next element */
+            s -> top = i -> next;
+            free(i -> data);
+            free(i);
+            i = s -> top;
+        }
+    }
+    free(s);
+}
+
+/*
+ * Stack_unitTest():
+ * Unit test.
  */
 void Stack_unitTest() {
+    puts("Stack_unitTest()");
     Stack *stack = Stack_new();
     Stack_push(stack, "teste3", sizeof("teste3"));
     Stack_push(stack, "teste2", sizeof("teste2"));
@@ -130,4 +168,6 @@ void Stack_unitTest() {
     printf("retorno = %s\n", Stack_pop(stack));
     printf("retorno = %s\n", Stack_pop(stack));
     printf("retorno = %s\n", Stack_pop(stack));
+    puts("");
+    Stack_destroy(stack);
 }

@@ -20,7 +20,8 @@ int Bag_isEmpty(Bag *b);                                // is bag empty?
 int Bag_size(Bag *b);                                   // returns bag's size
 int Bag_add(Bag *b, void *data, size_t dataSize);       // adds an item
 void **Bag_iterator(Bag *b);                            // iterator
-void  Bag_unitTest();                                   // test
+void Bag_unitTest();                                    // test
+void Bag_destroy(Bag *b);                               // frees memory
 
 /* Let's avoid having to pass sizeof(x) as argument every time we add something.
  * Instead write Bag_add(b, data) and this macro will expand sizeof for you.
