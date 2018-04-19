@@ -10,9 +10,9 @@
 #include "vector.h"
 
 int main() {
-    Bag_unitTest();
-    Stack_unitTest();
-    Queue_unitTest();
-    Vector_unitTest();
+    bag_unitTest();
+    stack_unitTest();
+    queue_unitTest();
+    vector_unitTest();
     return 0;
 }

@@ -6,7 +6,7 @@
 #include <string.h>
 #include "bag.h"
 
-#undef Bag_add
+#undef bag_add
 
 /*
  * Data Structures
@@ -22,13 +22,13 @@ struct Bag {
 };
 
 /*
- * Bag_new():
+ * bag_new():
  * Initializes an empty bag and returns a pointer to it.
  */
-Bag *Bag_new() {
+Bag *bag_new() {
     Bag *b = (Bag*) malloc(sizeof(Bag));
     if (!b) {
-        fprintf(stderr, "Bag_new: cannot create new bag!\n");
+        fprintf(stderr, "bag_new: cannot create new bag!\n");
         return NULL;
     }
     b -> top = NULL;
@@ -37,19 +37,19 @@ Bag *Bag_new() {
 }
 
 /*
- * Bag_isEmpty():
+ * bag_isEmpty():
  * Returns 1 if this bag is empty, 0 if it's not.
  */
-int Bag_isEmpty(Bag *b) {
+int bag_isEmpty(Bag *b) {
     if (b -> top == NULL) return 1;
     else return 0;
 }
 
 /*
- * Bag_size():
+ * bag_size():
  * Returns the number of items on this bag.
  */
-int Bag_size(Bag *b) {
+int bag_size(Bag *b) {
     return b -> size;
 }
 
@@ -73,14 +73,14 @@ Item *B_Item_new(size_t dataSize) {
 }
 
 /*
- * Bag_add():
+ * bag_add():
  * Copies the data and adds it to the bag.
  * Returns 0 if item was succesfully added or 1 otherwise.
  */
-int Bag_add(Bag *b, void *data, size_t dataSize) {
+int bag_add(Bag *b, void *data, size_t dataSize) {
     Item *i = B_Item_new(dataSize);
     if (i == NULL) {
-        fprintf(stderr, "Bag_add: cannot create new item!\n");
+        fprintf(stderr, "bag_add: cannot create new item!\n");
         return 1;
     }
     memcpy(i -> data, data, dataSize);
@@ -91,12 +91,12 @@ int Bag_add(Bag *b, void *data, size_t dataSize) {
 }
 
 /*
- * Bag_iterator():
+ * bag_iterator():
  * Copies every item in the bag and returns an array of items.
  */
-void **Bag_iterator(Bag *b) {
-    if (Bag_isEmpty(b) == 1) {
-        fprintf(stderr, "Bag_iterator: bag is empty!\n");
+void **bag_iterator(Bag *b) {
+    if (bag_isEmpty(b) == 1) {
+        fprintf(stderr, "bag_iterator: bag is empty!\n");
         return NULL;
     }
     void **items = (malloc(sizeof(void*) * b -> size));
@@ -111,11 +111,11 @@ void **Bag_iterator(Bag *b) {
 }
 
 /*
- * Bag_destroy():
+ * bag_destroy():
  * Destroys a bag, freeing all it's allocated memory.
  */
-void Bag_destroy(Bag *b) {
-    if (!Bag_isEmpty(b)) {
+void bag_destroy(Bag *b) {
+    if (!bag_isEmpty(b)) {
         Item *i = b -> top;
         while (i != NULL) {
             /* top of the bag points to next element */
@@ -129,28 +129,28 @@ void Bag_destroy(Bag *b) {
 }
 
 /*
- * Bag_unitTest():
+ * bag_unitTest():
  * Unit test.
  */
-void Bag_unitTest() {
-    puts("Bag_unitTest()");
-    Bag *bag = Bag_new();
+void bag_unitTest() {
+    puts("bag_unitTest()");
+    Bag *bag = bag_new();
     int *pointer;
     int tmp1 = 1;
     int tmp2 = 2;
     int tmp3 = 3;
     pointer = &tmp1;
-    Bag_add(bag, pointer, sizeof(*pointer));
+    bag_add(bag, pointer, sizeof(*pointer));
     pointer = &tmp2;
-    Bag_add(bag, pointer, sizeof(*pointer));
+    bag_add(bag, pointer, sizeof(*pointer));
     pointer = &tmp3;
-    Bag_add(bag, pointer, sizeof(*pointer));
+    bag_add(bag, pointer, sizeof(*pointer));
 
-    int **bag_items = (int**) Bag_iterator(bag);
-    for (int i = 0; i < Bag_size(bag); i++) {
+    int **bag_items = (int**) bag_iterator(bag);
+    for (int i = 0; i < bag_size(bag); i++) {
         printf("item %d = %d\n", i, *bag_items[i]);
     }
     puts("");
-    Bag_destroy(bag);
+    bag_destroy(bag);
 }
 

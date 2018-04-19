@@ -15,17 +15,17 @@ typedef struct Bag Bag;
 /*
  * Available operations
  */
-Bag *Bag_new();                                         // constructor
-int Bag_isEmpty(Bag *b);                                // is bag empty?
-int Bag_size(Bag *b);                                   // returns bag's size
-int Bag_add(Bag *b, void *data, size_t dataSize);       // adds an item
-void **Bag_iterator(Bag *b);                            // iterator
-void Bag_unitTest();                                    // test
-void Bag_destroy(Bag *b);                               // frees memory
+Bag *bag_new();                                         // constructor
+int bag_isEmpty(Bag *b);                                // is bag empty?
+int bag_size(Bag *b);                                   // returns bag's size
+int bag_add(Bag *b, void *data, size_t dataSize);       // adds an item
+void **bag_iterator(Bag *b);                            // iterator
+void bag_unitTest();                                    // test
+void bag_destroy(Bag *b);                               // frees memory
 
 /* Let's avoid having to pass sizeof(x) as argument every time we add something.
- * Instead write Bag_add(b, data) and this macro will expand sizeof for you.
+ * Instead write bag_add(b, data) and this macro will expand sizeof for you.
  */
-#define Bag_add(b, data) Bag_add(b, data, sizeof(data))
+#define bag_add(b, data) bag_add(b, data, sizeof(data))
 
 #endif /* _BAG_H_ */

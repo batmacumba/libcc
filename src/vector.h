@@ -15,15 +15,15 @@ typedef struct Vector Vector;
 /*
  * Available operations
  */
-Vector *Vector_new();                                               // construct
-int Vector_pushBack(Vector *v, void *new_data, size_t dataSize);    // pushes
-int Vector_popBack(Vector *v);                                      // pops
-void Vector_destroy(Vector *v);                                     // free
-void Vector_unitTest();                                             // test
+Vector *vector_new();                                               // construct
+int vector_pushBack(Vector *v, void *new_data, size_t dataSize);    // pushes
+int vector_popBack(Vector *v);                                      // pops
+void vector_destroy(Vector *v);                                     // free
+void vector_unitTest();                                             // test
 
 /* Let's avoid having to pass sizeof(x) as argument every time we add something.
- * Instead write Vector_pushBack(v, data) and this macro will expand sizeof.
+ * Instead write vector_pushBack(v, data) and this macro will expand sizeof.
  */
-#define Vector_pushBack(v, data) Vector_pushBack(v, data, sizeof(data))
+#define vector_pushBack(v, data) vector_pushBack(v, data, sizeof(data))
 
 #endif /* _VECTOR_H_ */

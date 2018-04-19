@@ -6,7 +6,7 @@
 #include <string.h>
 #include "queue.h"
 
-#undef Queue_enqueue
+#undef queue_enqueue
 
 /*
  * Data Structures
@@ -23,13 +23,13 @@ struct Queue {
 };
 
 /*
- * Queue_new():
+ * queue_new():
  * Initializes an empty queue and returns a pointer to it.
  */
-Queue *Queue_new() {
+Queue *queue_new() {
     Queue *q = (Queue*) malloc(sizeof(Queue));
     if (!q) {
-        fprintf(stderr, "Queue_new: cannot create new queue!\n");
+        fprintf(stderr, "queue_new: cannot create new queue!\n");
         return NULL;
     }
     q -> first = NULL;
@@ -39,19 +39,19 @@ Queue *Queue_new() {
 }
 
 /*
- * Queue_isEmpty():
+ * queue_isEmpty():
  * Returns 1 if this queue is empty, 0 if it's not.
  */
-int Queue_isEmpty(Queue *q) {
+int queue_isEmpty(Queue *q) {
     if (q -> first == NULL) return 1;
     else return 0;
 }
 
 /*
- * Queue_size():
+ * queue_size():
  * Returns the number of items on this queue.
  */
-int Queue_size(Queue *q) {
+int queue_size(Queue *q) {
     return q -> size;
 }
 
@@ -75,61 +75,61 @@ Item *Q_Item_new(size_t dataSize) {
 }
 
 /*
- * Queue_enqueue():
+ * queue_enqueue():
  * Copies the data and adds the item to the end of the queue.
  * Returns 0 if item was succesfully enqueued or 1 otherwise.
  */
-int Queue_enqueue(Queue *q, void *data, size_t dataSize) {
+int queue_enqueue(Queue *q, void *data, size_t dataSize) {
     Item *old_last = q -> last;
     q -> last = Q_Item_new(dataSize);
     if (q -> last == NULL) {
-        fprintf(stderr, "Queue_enqueue: cannot create new item!\n");
+        fprintf(stderr, "queue_enqueue: cannot create new item!\n");
         /* returns q -> last to it's previous address */
         q -> last = old_last;
         return 1;
     }
     memcpy(q -> last -> data, data, dataSize);
-    if (Queue_isEmpty(q) == 1) q -> first = q -> last;
+    if (queue_isEmpty(q) == 1) q -> first = q -> last;
     else old_last -> next = q -> last;
     q -> size++;
     return 0;
 }
 
 /*
- * Queue_dequeue():
+ * queue_dequeue():
  * Removes the item from the first spot and returns it.
  */
-void *Queue_dequeue(Queue *q) {
-    if (Queue_isEmpty(q) == 1) {
-        fprintf(stderr, "Queue_dequeue: Queue is empty!\n");
+void *queue_dequeue(Queue *q) {
+    if (queue_isEmpty(q) == 1) {
+        fprintf(stderr, "queue_dequeue: queue is empty!\n");
         return NULL;
     }
     void *data = q -> first -> data;
     q -> first = q -> first -> next;
     q -> size--;
-    if (Queue_isEmpty(q) == 1) q -> last = NULL;
+    if (queue_isEmpty(q) == 1) q -> last = NULL;
     return data;
 }
 
 /*
- * Queue_peek():
+ * queue_peek():
  * Returns the item on the first spot of the queue w/o removing
  */
-void *Queue_peek(Queue *q) {
-    if (Queue_isEmpty(q) == 1) {
-        fprintf(stderr, "Queue_peek: Queue is empty!\n");
+void *queue_peek(Queue *q) {
+    if (queue_isEmpty(q) == 1) {
+        fprintf(stderr, "queue_peek: queue is empty!\n");
         return NULL;
     }
     return q -> first -> data;
 }
 
 /*
- * Queue_iterator():
+ * queue_iterator():
  * Copies all the items on the queue and returns an array.
  */
-void **Queue_iterator(Queue *q) {
-    if (Queue_isEmpty(q)) {
-        fprintf(stderr, "Queue_iterator: Queue is empty!\n");
+void **queue_iterator(Queue *q) {
+    if (queue_isEmpty(q)) {
+        fprintf(stderr, "queue_iterator: queue is empty!\n");
         return NULL;
     }
     void **items = (malloc(sizeof(void*) * q -> size));
@@ -144,11 +144,11 @@ void **Queue_iterator(Queue *q) {
 }
 
 /*
- * Queue_destroy():
+ * queue_destroy():
  * Destroys a queue, freeing all it's allocated memory.
  */
-void Queue_destroy(Queue *q) {
-    if (!Queue_isEmpty(q)) {
+void queue_destroy(Queue *q) {
+    if (!queue_isEmpty(q)) {
         Item *i = q -> first;
         while (i != NULL) {
             /* first element of the queue is now the next element */
@@ -162,18 +162,18 @@ void Queue_destroy(Queue *q) {
 }
 
 /*
- * Queue_unitTest():
+ * queue_unitTest():
  * Unit test.
  */
-void Queue_unitTest() {
-    puts("Queue_unitTest()");
-    Queue *queue = Queue_new();
-    Queue_enqueue(queue, "teste1", sizeof("teste1"));
-    Queue_enqueue(queue, "teste2", sizeof("teste2"));
-    Queue_enqueue(queue, "teste3", sizeof("teste3"));
-    printf("retorno = %s\n", Queue_dequeue(queue));
-    printf("retorno = %s\n", Queue_dequeue(queue));
-    printf("retorno = %s\n", Queue_dequeue(queue));
+void queue_unitTest() {
+    puts("queue_unitTest()");
+    Queue *queue = queue_new();
+    queue_enqueue(queue, "teste1", sizeof("teste1"));
+    queue_enqueue(queue, "teste2", sizeof("teste2"));
+    queue_enqueue(queue, "teste3", sizeof("teste3"));
+    printf("retorno = %s\n", queue_dequeue(queue));
+    printf("retorno = %s\n", queue_dequeue(queue));
+    printf("retorno = %s\n", queue_dequeue(queue));
     puts("");
-    Queue_destroy(queue);
+    queue_destroy(queue);
 }

@@ -6,7 +6,7 @@
 #include <string.h>
 #include "vector.h"
 
-#undef Vector_pushBack
+#undef vector_pushBack
 
 /*
  * Data Structures
@@ -18,14 +18,14 @@ struct Vector {
 };
 
 /*
- * Vector_new():
+ * vector_new():
  * Initializes an empty vector and returns a pointer to it.
  */
-Vector *Vector_new()
+Vector *vector_new()
 {
     Vector *v = (Vector*) malloc(sizeof(Vector));
     if (!v) {
-        fprintf(stderr, "Vector_new: Cannot create new vector!\n");
+        fprintf(stderr, "vector_new: Cannot create new vector!\n");
         return NULL;
     }
     v->items = (void**)malloc(sizeof(void*));
@@ -35,16 +35,16 @@ Vector *Vector_new()
 }
 
 /*
- * Vector_resize():
+ * vector_resize():
  * Resizes the vector so its capacity is new_size.
  * Returns 0 if item was succesfully resized and 1 otherwise.
  * If resizing is not sucessfull, vector remains unaltered.
  */
-int Vector_resize(Vector *v, int new_size)
+int vector_resize(Vector *v, int new_size)
 {
     void** items_tmp = (void**)realloc(v->items, new_size*sizeof(void*));
     if(!items_tmp) {
-        fprintf(stderr, "Vector_resize: Cannot resize vector!\n");
+        fprintf(stderr, "vector_resize: Cannot resize vector!\n");
         return 1;
     }
     v->items = items_tmp;
@@ -53,14 +53,14 @@ int Vector_resize(Vector *v, int new_size)
 }
 
 /*
- * Vector_pushBack():
+ * vector_pushBack():
  * Adds the item to the end of the vector.
  * Returns 0 if item was succesfully added and 1 otherwise.
  */
-int Vector_pushBack(Vector *v, void *data, size_t dataSize) {
+int vector_pushBack(Vector *v, void *data, size_t dataSize) {
     if(v->size == v->capacity) {
-        if (Vector_resize(v, 2*v->capacity)) {
-            fprintf(stderr, "Vector_pushBack: Cannot append to vector!\n");
+        if (vector_resize(v, 2*v->capacity)) {
+            fprintf(stderr, "vector_pushBack: Cannot append to vector!\n");
             return 1;
         }
     }
@@ -70,13 +70,13 @@ int Vector_pushBack(Vector *v, void *data, size_t dataSize) {
 }
 
 /*
- * Vector_popBack():
+ * vector_popBack():
  * Removes the item at the end of the vector.
  * Returns 0 if item was succesfully removed and 1 otherwise.
  */
-int Vector_popBack(Vector *v) {
+int vector_popBack(Vector *v) {
     if(v->size == 0) {
-        fprintf(stderr, "Vector_popBack: vector is already empty!\n");
+        fprintf(stderr, "vector_popBack: vector is already empty!\n");
         return 1;
     }
     free(v->items[v->size - 1]);
@@ -85,10 +85,10 @@ int Vector_popBack(Vector *v) {
 }
 
 /*
- * Vector_destroy():
+ * vector_destroy():
  * Destroys a vector, freeing all the allocated memory it is using.
  */
-void Vector_destroy(Vector *v) {
+void vector_destroy(Vector *v) {
     for(int i = 0; i < v->size; i++)
         free(v->items[i]);
     free(v->items);
@@ -96,12 +96,12 @@ void Vector_destroy(Vector *v) {
     v = NULL;
 }
 
-/* Vector_destroy():
+/* vector_destroy():
  * Unit test.
  */
-void Vector_unitTest() {
-    puts("Vector_unitTest()");
-    Vector *v = Vector_new();
+void vector_unitTest() {
+    puts("vector_unitTest()");
+    Vector *v = vector_new();
 
     int *tmp1 = (int*)malloc(sizeof(int));
     int *tmp2 = (int*)malloc(sizeof(int));
@@ -115,11 +115,11 @@ void Vector_unitTest() {
     *tmp4 = 4;
     *tmp5 = 5;
 
-    Vector_pushBack(v, tmp1, sizeof(tmp1));
-    Vector_pushBack(v, tmp2, sizeof(tmp2));
-    Vector_pushBack(v, tmp3, sizeof(tmp3));
-    Vector_pushBack(v, tmp4, sizeof(tmp4));
-    Vector_pushBack(v, tmp5, sizeof(tmp5));
+    vector_pushBack(v, tmp1, sizeof(tmp1));
+    vector_pushBack(v, tmp2, sizeof(tmp2));
+    vector_pushBack(v, tmp3, sizeof(tmp3));
+    vector_pushBack(v, tmp4, sizeof(tmp4));
+    vector_pushBack(v, tmp5, sizeof(tmp5));
     
     printf("After 5 pushBack calls: \n");
     printf("Size: %d\n", v->size);
@@ -132,8 +132,8 @@ void Vector_unitTest() {
     }
     printf("]\n");
 
-    Vector_popBack(v);
-    Vector_popBack(v);
+    vector_popBack(v);
+    vector_popBack(v);
 
     printf("\nAfter 2 popBack calls: \n");
     printf("Size: %d\n", v->size);
@@ -146,5 +146,5 @@ void Vector_unitTest() {
     }
     printf("]\n");
     puts("");
-    Vector_destroy(v);
+    vector_destroy(v);
 }
