@@ -135,16 +135,12 @@ void bag_destroy(Bag *b) {
 void bag_unitTest() {
     puts("bag_unitTest()");
     Bag *bag = bag_new();
-    int *pointer;
     int tmp1 = 1;
     int tmp2 = 2;
     int tmp3 = 3;
-    pointer = &tmp1;
-    bag_add(bag, pointer, sizeof(*pointer));
-    pointer = &tmp2;
-    bag_add(bag, pointer, sizeof(*pointer));
-    pointer = &tmp3;
-    bag_add(bag, pointer, sizeof(*pointer));
+    bag_add(bag, &tmp1, sizeof(int));
+    bag_add(bag, &tmp2, sizeof(int));
+    bag_add(bag, &tmp3, sizeof(int));
 
     int **bag_items = (int**) bag_iterator(bag);
     for (int i = 0; i < bag_size(bag); i++) {
