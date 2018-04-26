@@ -20,8 +20,8 @@ int list_append(List *l, void *data, size_t dataSize);  // appends data to list
 int list_prepend(List *l, void *data, size_t dataSize); // prepends data to list
 //List *list_extend();
 int list_insert(List *l, int i,
-                void *data, size_t dataSize)            // puts data at given i
-//int list_get();
+                void *data, size_t dataSize);           // puts data at given i
+void *list_get(List *l, int i);
 //int list_remove();
 //int list_pop();
 //int list_contains();

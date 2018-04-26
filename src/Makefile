@@ -1,7 +1,7 @@
 CC := gcc
 CCFLAGS := -Ofast -msse2 -march=native -Wall -Wextra -Wpedantic
 
-all: bag.o queue.o stack.o vector.o
+all: bag.o queue.o stack.o vector.o list.o
 
 test: bag.o queue.o stack.o vector.o list.o
 	$(CC) test.c *.o -o $@
