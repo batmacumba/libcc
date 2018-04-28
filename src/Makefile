@@ -18,4 +18,4 @@ list.o: list.c
 	$(CC) $(CCFLAGS) -c $< -o $@
 
 clean:
-	rm *.o test
+	rm *.o test bag queue stack vector list

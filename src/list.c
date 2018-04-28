@@ -14,6 +14,9 @@
 #undef list_insert
 #undef list_set
 
+#define PREPEND     0
+#define APPEND      1
+
 /* Data Structure */
 struct List {
     void **items;
@@ -42,31 +45,32 @@ list_new() {
 
 /**
  *  list_resize():
- *      Resizes the list to the given argument.
+ *      Resizes the list to the given capacity.
  */
 static int
-list_resize(List *l, int allocated, int prepend) {
+list_resize(List *self, int new_allocated, int flag) {
     /* size of the new block of memory */
-    size_t memSize = allocated * sizeof(void*);
-    void **i;
-    /* prepend allocates memory and copies data back into the second half */
-    if (prepend) {
-        i = (void**) malloc(memSize);
-        memcpy(i + (allocated / 2) , l -> items, memSize / 2);
-        /* important! offsets the "zero element" on the list */
-        l -> zero = allocated / 2;
+    size_t arraySize = new_allocated * sizeof(void *);
+    void **new_items = NULL;
+    
+    /* append simply tries to allocate on the end of the current block */
+    if (flag == APPEND) {
+        new_items = (void**) realloc(self -> items, arraySize);
     }
-    /* append simply tries to allocate more memory on the existing block */
-    else {
-        i = (void**) realloc(l -> items, memSize);
+    /* prepend allocates and copies to the middle of the new block */
+    else if (flag == PREPEND) {
+        new_items = (void**) malloc(arraySize);
+        memcpy(new_items + new_allocated / 2, self -> items, arraySize / 2);
+        /* important! offsets the "zero element" on the list */
+        self -> zero = new_allocated / 2;
     }
     /* error checking and variable updating */
-    if(!i) {
-        fprintf(stderr, "list_resize: cannot resize list!\n");
+    else if(!new_items) {
+        fprintf(stderr, "list_resize: cannot resize list\n");
         return -1;
     }
-    l -> items = i;
-    l -> allocated = allocated;
+    self -> items = new_items;
+    self -> allocated = new_allocated;
     return 0;
 }
 
@@ -76,47 +80,65 @@ list_resize(List *l, int allocated, int prepend) {
  */
 static int
 list_memHandler(List *self, int flag) {
-    /* if full, resizes it to 1.5x it's currently allocated capacity */
+    int handler;
+    /* full or empty */
     if (self -> n == self -> allocated) {
-        if (list_resize(self, 1.5 * self -> allocated, 0) < 0) {
-            fprintf(stderr, "list_memHandler: cannot append to list!\n");
-            return -1;
-        }
+        if (self -> allocated == 0) handler = list_resize(self, 1, APPEND);
+        else handler = list_resize(self, 2 * self -> allocated, flag);
     }
+    /* very sparse */
+    else if (self -> allocated / self -> n >= 4)
+        handler = list_resize(self, self -> allocated / 2, flag);
+    /* no empty space on the beggining */
+    else if (self -> items[0] != NULL && flag == PREPEND) {
+        handler = list_resize(self, 2 * self -> allocated, flag);
+    }
+    /* no resize needed, move along */
+    else {
+        puts("no resize");
+        handler = 0;
+    }
+    /* error? */
+    if (handler < 0)
+        fprintf(stderr, "list_memHandler: error resizing list\n");
+    return handler;
+    
 }
-///**
-// *  list_append():
-// *      Adds an item to the end of the list.
-// */
-//int
-//list_append(List *l, void *data, size_t dataSize) {
-//
-//    /* allocates space on the heap and copies the data */
-//    l -> items[l -> n] = malloc(dataSize);
-//    memcpy(l -> items[l -> n++], data, dataSize);
-//    return 0;
-//}
-//
-///**
-// *  list_prepend():
-// *      Adds an item to the beggining of the list. Returns 0 if everything goes
-// *      as expected and 1 otherwise.
-// */
-//int list_prepend(List *l, void *data, size_t dataSize) {
-//    /* if the list is full, resize it to two times it's current allocated */
-//    if (l -> n == l -> allocated || l -> zero == 0) {
-//        if (list_resize(l, 2 * l -> allocated, 1)) {
-//            fprintf(stderr, "list_prepend: cannot prepend to list!\n");
-//            return -1;
-//        }
-//    }
-//    /* allocates space on the heap and copies the data */
-//    if (l -> zero > 0) l -> zero--;
-//    l -> items[l -> zero] = malloc(dataSize);
-//    memcpy(l -> items[l -> zero], data, dataSize);
-//    l -> n++;
-//    return 0;
-//}
+
+/**
+ *  list_append():
+ *      Adds an item to the end of the list.
+ */
+int
+list_append(List *op, void *data, size_t dataSize) {
+    if (list_memHandler(op, APPEND) < 0) {
+        fprintf(stderr, "list_append: error handling memory\n");
+        return -1;
+    }
+    /* allocates space on the heap and copies the data */
+    op -> items[op -> n] = malloc(dataSize);
+    memcpy(op -> items[op -> n++], data, dataSize);
+    return 0;
+}
+
+/**
+ *  list_prepend():
+ *      Adds an item to the beggining of the list.
+ */
+int list_prepend(List *op, void *data, size_t dataSize) {
+    if (list_memHandler(op, PREPEND) < 0) {
+        fprintf(stderr, "list_prepend: error handling memory\n");
+        return -1;
+    }
+      printf("op -> zero = %d\n", op -> zero);
+    /* allocates space on the heap and copies the data */
+    if (op -> zero > 0) op -> zero--;
+    op -> items[op -> zero] = malloc(dataSize);
+    memcpy(op -> items[op -> zero], data, dataSize);
+    op -> n++;
+  
+    return 0;
+}
 //
 ///**
 // *  list_insert():
@@ -157,6 +179,7 @@ list_get(List *op, int i) {
             return NULL;
         }
     }
+    printf("op -> zero = %d\n", op -> zero + i);
     return op -> items[op -> zero + i];
 }
 
@@ -185,6 +208,8 @@ list_set(List *op, int i, void *data, size_t dataSize) {
         return -1;
     }
     /* finally copies the data and returns */
+    free(op -> items[op -> zero + i]);
+    op -> items[op -> zero + i] = malloc(dataSize);
     memcpy(op -> items[op -> zero + i], data, dataSize);
     return 0;
 }
@@ -196,10 +221,13 @@ list_set(List *op, int i, void *data, size_t dataSize) {
 
 int main() {
     List *l = list_new();
-    int n = 4;
-//    for (int i = 0; i < n; i++)
-//        list_prepend(l, &i);
-//    print_list(l);
+    int n = 4, x = 99;
+    for (int i = 0; i < n; i++) {
+        x += 3;
+        list_prepend(l, &x);
+    }
+    for (int i = 0; i < n; i++)
+        printf("list[%d] = %d\n", i, * (int*) list_get(l, i));
     return 0;
 }
 
