@@ -1,6 +1,7 @@
 # To-do
 
 ## Geral:
+- [ ] Eu acho que os includes deveriam estar nos headers, para não precisar incluir tudo de novo quando for usar a estrutura em um outro arquivo  
 - [x] Desconfio que as funções Item_new em queue.c e em stack.c conflitarão em um arquivo que importe ambas as estruturas
 - [ ] Escrever testes completos pras EDs existentes
 - [ ] Escrever documentação completa para as EDs

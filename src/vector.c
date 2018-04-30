@@ -43,6 +43,14 @@ int vector_getSize(Vector *v) {
 }
 
 /*
+ * vector_getCapacity():
+ * Returns capacity of vector
+ */
+int vector_getCapacity(Vector *v) {
+    return v->capacity;
+}
+
+/*
  * vector_resize():
  * Resizes the vector so its capacity is new_size.
  * Returns 0 if item was succesfully resized and 1 otherwise.
@@ -78,7 +86,7 @@ void *vector_at(Vector *v, int index) {
  * Returns 1 if vector is empty and 0 otherwise
  */
 int vector_isEmpty(Vector *v) {
-        return (v->size == 0);
+    return (v->size == 0);
 }
 
 /*
@@ -151,13 +159,13 @@ void vector_unitTest() {
     vector_pushBack(v, tmp5, sizeof(tmp5));
 
     printf("After 5 pushBack calls: \n");
-    printf("Size: %d\n", v->size);
-    printf("Capacity: %d\n", v->capacity);
+    printf("Size: %d\n", vector_getSize(v));
+    printf("Capacity: %d\n", vector_getCapacity(v));
 
     printf("Vector items: [");
-    printf("%d", *(int*)(v->items[0]));
-    for(int i = 1; i < v->size; i++) {
-        printf(", %d", *(int*)(v->items[i]));
+    printf("%d", *(int*)(vector_at(v, 0)));
+    for(int i = 1; i < vector_getSize(v); i++) {
+        printf(", %d", *(int*)(vector_at(v, i)));
     }
     printf("]\n");
 
@@ -165,11 +173,11 @@ void vector_unitTest() {
     vector_popBack(v);
 
     printf("\nAfter 2 popBack calls: \n");
-    printf("Size: %d\n", v->size);
-    printf("Capacity: %d\n", v->capacity);
+    printf("Size: %d\n", vector_getSize(v));
+    printf("Capacity: %d\n", vector_getCapacity(v));
 
     printf("Vector items: [");
-    printf("%d", *(int*)(v->items[0]));
+    printf("%d", *(int*)(vector_at(v, 0)));
     for(int i = 1; i < vector_getSize(v); i++)
         printf(", %d", *(int*)(vector_at(v, i)));
     printf("]\n");
