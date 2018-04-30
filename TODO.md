@@ -6,8 +6,8 @@
 - [ ] Escrever documentação completa para as EDs
 
 ## Vector:
-- [ ] Criar uma função isEmpty
-- [ ] Criar uma função at() que retorna o elemento num determinado índice (para ocultar a implementação interna de v->items)
+- [x] Criar uma função isEmpty
+- [x] Criar uma função at() que retorna o elemento num determinado índice (para ocultar a implementação interna de v->items)
 - [ ] Criar uma função de insert em um índice qualquer do Vector
 - [ ] Criar uma função de erase em um índice qualquer do Vector
 - [ ] Fazer o vetor dar resize pra metade quando o size é 1/4 da capacity

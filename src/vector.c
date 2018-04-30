@@ -35,6 +35,14 @@ Vector *vector_new()
 }
 
 /*
+ * vector_getSize():
+ * Returns size of vector
+ */
+int vector_getSize(Vector *v) {
+    return v->size;
+}
+
+/*
  * vector_resize():
  * Resizes the vector so its capacity is new_size.
  * Returns 0 if item was succesfully resized and 1 otherwise.
@@ -50,6 +58,27 @@ int vector_resize(Vector *v, int new_size)
     v->items = items_tmp;
     v->capacity = new_size;
     return 0;
+}
+
+/*
+ *vector_at();
+ * Returns element at given index
+ * If is out of range, returns NULL
+ */
+void *vector_at(Vector *v, int index) {
+    if (index >= v->size || index < 0) {
+        fprintf(stderr, "vector_at: index out of range!\n");
+        return NULL;
+    }
+    return v->items[index];
+}
+
+/*
+ * vector_isEmpty();
+ * Returns 1 if vector is empty and 0 otherwise
+ */
+int vector_isEmpty(Vector *v) {
+        return (v->size == 0);
 }
 
 /*
@@ -120,7 +149,7 @@ void vector_unitTest() {
     vector_pushBack(v, tmp3, sizeof(tmp3));
     vector_pushBack(v, tmp4, sizeof(tmp4));
     vector_pushBack(v, tmp5, sizeof(tmp5));
-    
+
     printf("After 5 pushBack calls: \n");
     printf("Size: %d\n", v->size);
     printf("Capacity: %d\n", v->capacity);
@@ -141,9 +170,8 @@ void vector_unitTest() {
 
     printf("Vector items: [");
     printf("%d", *(int*)(v->items[0]));
-    for(int i = 1; i < v->size; i++) {
-        printf(", %d", *(int*)(v->items[i]));
-    }
+    for(int i = 1; i < vector_getSize(v); i++)
+        printf(", %d", *(int*)(vector_at(v, i)));
     printf("]\n");
     puts("");
     vector_destroy(v);
