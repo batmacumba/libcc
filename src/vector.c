@@ -133,7 +133,7 @@ void vector_destroy(Vector *v) {
     v = NULL;
 }
 
-/* vector_destroy():
+/*
  * Unit test.
  */
 void vector_unitTest() {
