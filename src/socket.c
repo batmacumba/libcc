@@ -140,8 +140,8 @@ socket_read(int vargc, ...)
     /* initialize with default values */
     struct Socket *s = NULL;
     void *buffer = NULL;
-    // TODO: inferir tamanho do buffer?
-    size_t buffersize = sizeof(buffer);
+	size_t buffersize = 0;
+	// TODO: Linux malloc_usable_size
     int flags = 0;
     /* assign custom values */
     for (int i = 0; i < vargc; i++) {
@@ -151,12 +151,13 @@ socket_read(int vargc, ...)
         else if (i == 3) flags = va_arg(vargp, int);
     }
     va_end(vargp);
+	/* attempt to determine buffersize */
+	if (!buffersize) buffersize = malloc_size(buffer);
+	if (!buffersize) buffersize = strlen(buffer);
 //    printf("recv: buffer %s\nbuffersize %zu\nflags %d\n", buffer, buffersize, flags);
-    if (vargc < 3) buffersize = strlen(buffer);
-    
-    
+	
     /* Zera o buffer e lê a mensagem se houver */
-    memset(buffer, 0, strlen(buffer));
+    memset(buffer, 0, buffersize);
     
     return recv(s -> connfd, buffer, buffersize, flags);
 }
@@ -261,8 +262,8 @@ socket_write(int vargc, ...)
     /* initialize with default values */
     struct Socket *s = NULL;
     void *buffer = NULL;
-    // TODO: inferir tamanho do buffer?
-    size_t buffersize = sizeof(buffer);
+	size_t buffersize = 0;
+	// TODO: Linux malloc_usable_size
     int flags = 0;
     /* assign custom values */
     for (int i = 0; i < vargc; i++) {
@@ -272,7 +273,9 @@ socket_write(int vargc, ...)
         else if (i == 3) flags = va_arg(vargp, int);
     }
     va_end(vargp);
-    if (vargc < 3) buffersize = strlen(buffer);
+	/* attempt to determine buffersize */
+	if (!buffersize) buffersize = malloc_size(buffer);
+	if (!buffersize) buffersize = strlen(buffer);
 //    printf("send: buffer %s\nbuffersize %zu\nflags %d\n", buffer, buffersize, flags);
     return send(s -> sockfd, buffer, buffersize, flags);
 }
