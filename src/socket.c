@@ -16,8 +16,8 @@
  * Data Structures
  */
 struct Socket {
-    int sockFd, connFd;
-    struct sockaddr_in servAddr, cliAddr;
+    int sockfd, connfd;
+    struct sockaddr_in servaddr, cliaddr;
     int type, protocol;
 };
 
@@ -65,27 +65,27 @@ socket_open(int vargc, ...)
     s -> protocol = protocol;
 
     /* Criação de um socket */
-    if ((s -> sockFd = socket(family, type, protocol)) == -1) {
+    if ((s -> sockfd = socket(family, type, protocol)) == -1) {
         fprintf(stderr, "socket_open: cannot create new socket\n");
         // TODO: quit
         return NULL;
     }
 
     /* Configuração da struct sockaddr_in */
-    bzero(&s -> servAddr, sizeof(struct sockaddr_in));
-    s -> servAddr.sin_family      = family;
-    s -> servAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    s -> servAddr.sin_port        = htons(port);
+    bzero(&s -> servaddr, sizeof(struct sockaddr_in));
+    s -> servaddr.sin_family      = family;
+    s -> servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    s -> servaddr.sin_port        = htons(port);
 
     /* Bind da porta */
-    if (bind(s -> sockFd, (struct sockaddr *) &s -> servAddr, sizeof(struct sockaddr_in)) == -1) {
+    if (bind(s -> sockfd, (struct sockaddr *) &s -> servaddr, sizeof(struct sockaddr_in)) == -1) {
         fprintf(stderr, "socket_open: cannot bind new socket\n");
         return NULL;
     }
 
     /* Orientado a conexão: precisa chamar a função listen */
     if (type == SOCK_STREAM || type == SOCK_SEQPACKET) {
-        if (listen(s -> sockFd, queue) == -1) {
+        if (listen(s -> sockfd, queue) == -1) {
             fprintf(stderr, "socket_open: cannot listen new socket\n");
             return NULL;
         }
@@ -110,12 +110,12 @@ socket_await(Socket *s)
     if (!(s -> type == SOCK_STREAM || s -> type == SOCK_SEQPACKET)) return -1;
     /* Orientado a conexão: precisa chamar a função listen e accept */
     if (s -> type == SOCK_STREAM || s -> type == SOCK_SEQPACKET) {
-        unsigned int len = sizeof(s -> cliAddr);
-        if ((s -> connFd = accept(s -> sockFd, (struct sockaddr *) &s -> cliAddr, &len)) == -1) {
+        unsigned int len = sizeof(s -> cliaddr);
+        if ((s -> connfd = accept(s -> sockfd, (struct sockaddr *) &s -> cliaddr, &len)) == -1) {
             fprintf(stderr, "socket_read: cannot accept on new socket\n");
             return -1;
         }
-        else return s -> connFd;
+        else return s -> connfd;
     }
     
     else return -1;
@@ -125,7 +125,7 @@ socket_await(Socket *s)
  * socket_read(): tenta ler mensagens e retorna no buffer
  * @s: ponteiro para o socket que será lido
  * @buffer: espaço na memória onde será escrita a mensagem
- * @bufferSize: tamanho máximo da mensagem
+ * @buffersize: tamanho máximo da mensagem
  * @flags: flags para a system call recv
  *
  * @return: número de bytes lidos
@@ -141,24 +141,24 @@ socket_read(int vargc, ...)
     struct Socket *s = NULL;
     void *buffer = NULL;
     // TODO: inferir tamanho do buffer?
-    size_t bufferSize = sizeof(buffer);
+    size_t buffersize = sizeof(buffer);
     int flags = 0;
     /* assign custom values */
     for (int i = 0; i < vargc; i++) {
         if (i == 0) s = va_arg(vargp, struct Socket *);
         else if (i == 1) buffer = va_arg(vargp, void *);
-        else if (i == 2) bufferSize = va_arg(vargp, size_t);
+        else if (i == 2) buffersize = va_arg(vargp, size_t);
         else if (i == 3) flags = va_arg(vargp, int);
     }
     va_end(vargp);
-//    printf("recv: buffer %s\nbufferSize %zu\nflags %d\n", buffer, bufferSize, flags);
-    if (vargc < 3) bufferSize = strlen(buffer);
+//    printf("recv: buffer %s\nbuffersize %zu\nflags %d\n", buffer, buffersize, flags);
+    if (vargc < 3) buffersize = strlen(buffer);
     
     
     /* Zera o buffer e lê a mensagem se houver */
     memset(buffer, 0, strlen(buffer));
     
-    return recv(s -> connFd, buffer, bufferSize, flags);
+    return recv(s -> connfd, buffer, buffersize, flags);
 }
 
 /**
@@ -172,7 +172,7 @@ socket_port(Socket *s)
 {
     struct sockaddr_in sin;
     socklen_t len = sizeof(sin);
-    if (getsockname(s -> sockFd, (struct sockaddr *)&sin, &len) != -1)
+    if (getsockname(s -> sockfd, (struct sockaddr *)&sin, &len) != -1)
         return ntohs(sin.sin_port);
     return 0;
 }
@@ -222,19 +222,19 @@ socket_connect(int vargc, ...)
     s -> protocol = protocol;
     
     /* Criação de um socket */
-    if ((s -> sockFd = socket(family, type, protocol)) == -1) {
+    if ((s -> sockfd = socket(family, type, protocol)) == -1) {
         fprintf(stderr, "socket_connect: cannot create new socket\n");
         return NULL;
     }
     
     /* Configuração da struct sockaddr_in */
-    bzero(&s -> servAddr, sizeof(struct sockaddr_in));
-    s -> servAddr.sin_family      = family;
-    s -> servAddr.sin_addr.s_addr = inet_addr(address);
-    s -> servAddr.sin_port        = htons(port);
+    bzero(&s -> servaddr, sizeof(struct sockaddr_in));
+    s -> servaddr.sin_family      = family;
+    s -> servaddr.sin_addr.s_addr = inet_addr(address);
+    s -> servaddr.sin_port        = htons(port);
     
     /* Tenta conectar ao servidor */
-    if (connect(s -> sockFd, (struct sockaddr *) &s -> servAddr, sizeof(struct sockaddr_in)) != 0) {
+    if (connect(s -> sockfd, (struct sockaddr *) &s -> servaddr, sizeof(struct sockaddr_in)) != 0) {
         fprintf(stderr, "socket_connect: cannot connect to server\n");
         return NULL;
     }
@@ -246,7 +246,7 @@ socket_connect(int vargc, ...)
  * socket_write(): tenta escrever no socket
  * @s: ponteiro para o socket no qual será escrita a mensagem
  * @buffer: ponteiro para a mensagem
- * @bufferSize: tamanho da mensagem
+ * @buffersize: tamanho da mensagem
  * @flags: flags opcionais para a chamada send
  *
  * @return: número de bytes escritos
@@ -262,19 +262,19 @@ socket_write(int vargc, ...)
     struct Socket *s = NULL;
     void *buffer = NULL;
     // TODO: inferir tamanho do buffer?
-    size_t bufferSize = sizeof(buffer);
+    size_t buffersize = sizeof(buffer);
     int flags = 0;
     /* assign custom values */
     for (int i = 0; i < vargc; i++) {
         if (i == 0) s = va_arg(vargp, struct Socket *);
         else if (i == 1) buffer = va_arg(vargp, void *);
-        else if (i == 2) bufferSize = va_arg(vargp, size_t);
+        else if (i == 2) buffersize = va_arg(vargp, size_t);
         else if (i == 3) flags = va_arg(vargp, int);
     }
     va_end(vargp);
-    if (vargc < 3) bufferSize = strlen(buffer);
-//    printf("send: buffer %s\nbufferSize %zu\nflags %d\n", buffer, bufferSize, flags);
-    return send(s -> sockFd, buffer, bufferSize, flags);
+    if (vargc < 3) buffersize = strlen(buffer);
+//    printf("send: buffer %s\nbuffersize %zu\nflags %d\n", buffer, buffersize, flags);
+    return send(s -> sockfd, buffer, buffersize, flags);
 }
 
 /**
@@ -284,7 +284,7 @@ socket_write(int vargc, ...)
 void
 socket_close(Socket *s)
 {
-    close(s -> sockFd);
+    close(s -> sockfd);
     free(s);
 }
 
