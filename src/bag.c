@@ -1,14 +1,20 @@
-/*
+/*******************************************************************************
+ bag.c
+    Implementation of a bag using a linked list.
+*******************************************************************************/
+
+/**
  * Includes & Macros
  */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "../header/error.h"
 #include "bag.h"
 
 #undef bag_add
 
-/*
+/**
  * Data Structures
  */
 typedef struct Item {
@@ -21,11 +27,11 @@ struct Bag {
     int size;
 };
 
-/*
- * bag_new():
- * Initializes an empty bag and returns a pointer to it.
+/**
+ * bag_new - initializes an empty bag
  */
-Bag *bag_new() {
+Bag *
+bag_new() {
     Bag *b = (Bag*) malloc(sizeof(Bag));
     if (!b) {
         fprintf(stderr, "bag_new: cannot create new bag!\n");
@@ -36,49 +42,57 @@ Bag *bag_new() {
     return b;
 }
 
-/*
- * bag_isEmpty():
- * Returns 1 if this bag is empty, 0 if it's not.
+/**
+ * bag_isEmpty - checks if the first element on the list is null
+ * @return: 1 if empty, 0 otherwise
  */
-int bag_isEmpty(Bag *b) {
+int
+bag_isEmpty(Bag *b) {
     if (b -> top == NULL) return 1;
     else return 0;
 }
 
-/*
- * bag_size():
- * Returns the number of items on this bag.
+/**
+ * bag_size - returns the size of the bag
+ * @return: number of elements
  */
-int bag_size(Bag *b) {
+int
+bag_size(Bag *b) {
     return b -> size;
 }
 
-/*
- * B_Item_new():
- * Initializes an empty Item.
+/**
+ * bag_newItem - allocates an empty item
+ * @dataSize: number of bytes to be allocated
+ * @return: pointer to new item
  */
-Item *B_Item_new(size_t dataSize) {
+Item *
+bag_newItem(size_t dataSize) {
     Item *i = (Item*) malloc(sizeof(Item));
     if (!i) {
-        fprintf(stderr, "B_Item_new: cannot malloc new item!\n");
+        fprintf(stderr, "bag_newItem: cannot malloc new item!\n");
         return NULL;
     }
+    
     i -> data = malloc(dataSize);
     if (!i -> data) {
-        fprintf(stderr, "B_Item_new: cannot malloc space for data!\n");
+        fprintf(stderr, "bag_newItem: cannot malloc space for data!\n");
         return NULL;
     }
+    
     i -> next = NULL;
     return i;
 }
 
-/*
- * bag_add():
- * Copies the data and adds it to the bag.
- * Returns 0 if item was succesfully added or 1 otherwise.
+/**
+ * bag_add - copies the data and adds it to the top the list
+ * @b:
+ * @data:
+ * @dataSize:
  */
-int bag_add(Bag *b, void *data, size_t dataSize) {
-    Item *i = B_Item_new(dataSize);
+int
+bag_add(Bag *b, void *data, size_t dataSize) {
+    Item *i = bag_newItem(dataSize);
     if (i == NULL) {
         fprintf(stderr, "bag_add: cannot create new item!\n");
         return 1;

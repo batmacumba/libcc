@@ -218,16 +218,3 @@ list_set(List *op, int i, void *data, size_t dataSize) {
 #define list_prepend(l, data) list_prepend(l, data, sizeof(data))
 #define list_insert(l, i, data) list_append(l, i, data, sizeof(data))
 #define list_set(l, i, data) list_set(l, i, data, sizeof(data))
-
-int main() {
-    List *l = list_new();
-    int n = 4, x = 99;
-    for (int i = 0; i < n; i++) {
-        x += 3;
-        list_prepend(l, &x);
-    }
-    for (int i = 0; i < n; i++)
-        printf("list[%d] = %d\n", i, * (int*) list_get(l, i));
-    return 0;
-}
-
