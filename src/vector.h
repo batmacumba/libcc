@@ -18,6 +18,10 @@ typedef struct Vector Vector;
 Vector *vector_new();                                               // construct
 int vector_pushBack(Vector *v, void *new_data, size_t dataSize);    // pushes
 int vector_popBack(Vector *v);                                      // pops
+void *vector_at(Vector *v, int index);                              // accesses
+int vector_isEmpty(Vector *v);
+int vector_getSize(Vector *v);
+int vector_getCapacity(Vector *v);
 void vector_destroy(Vector *v);                                     // free
 void vector_unitTest();                                             // test
 
