@@ -9,10 +9,9 @@
 #include <string.h>
 #include "list.h"
 
-#undef list_append
-#undef list_prepend
-// #undef list_insert
-#undef list_set
+// #undef list_append
+// #undef list_prepend
+// #undef list_set
 
 #define APPEND      0
 #define PREPEND     1
@@ -33,16 +32,16 @@ struct List {
 List *
 list_new() 
 {
-    List *this = (List *) malloc(sizeof(List));
-    if (!this) {
+    List *l = (List *) malloc(sizeof(List));
+    if (!l) {
         fprintf(stderr, "list_new: cannot create new list!\n");
         return NULL;
     }
-    this -> items = NULL;
-    this -> n = 0;
-    this -> allocated = 0;
-    this -> zero = 0;
-    return this;
+    l -> items = NULL;
+    l -> n = 0;
+    l -> allocated = 0;
+    l -> zero = 0;
+    return l;
 }
 
 /**
@@ -52,17 +51,12 @@ list_new()
 static int
 list_resize(List *l, int new_allocated, int flag) 
 {
-    /* size of the new block of memory */
-    size_t new_array_size = new_allocated * sizeof(void *);
-    void **new_items = NULL;
+    void **new_items = (void **) calloc((size_t) new_allocated, sizeof(void *));
     
-    /* append simply tries to allocate on the end of the current block */
-    if (flag == APPEND) 
-        new_items = (void **) realloc(l -> items, new_array_size);
+    if (flag == APPEND)
+        memcpy(new_items, l -> items, l -> allocated * sizeof(void *));
     /* prepend allocates and copies to the middle of the new block */
     else if (flag == PREPEND) {
-        new_items = (void **) malloc(new_array_size);
-        // TODO: possível bug: alocar arrays de ponteiros == NULL
         memcpy(new_items + (new_allocated / 2), l -> items, l -> allocated * sizeof(void *));
         /* offsets the "zero element" on the list */
         l -> zero = new_allocated / 2;
@@ -80,11 +74,11 @@ list_resize(List *l, int new_allocated, int flag)
 }
 
 /**
- *  list_memHandler():
+ *  list_mem_handler():
  *      Checks if the list needs to shrink or grow and acts accordingly.
  */
 static int
-list_memHandler(List *l, int flag) 
+list_mem_handler(List *l, int flag) 
 {
     int handler;
     /* full or empty */
@@ -92,10 +86,11 @@ list_memHandler(List *l, int flag)
         if (l -> allocated == 0) handler = list_resize(l, 1, APPEND);
         else handler = list_resize(l, 2 * l -> allocated, flag);
     }
-    /* very sparse */
-    else if (l -> allocated / l -> n >= 4)
+    /* very sparse - caution with division by 0 */
+    else if (l -> n > 0 && l -> allocated / l -> n >= 4) {
         // TODO: funciona isso?
         handler = list_resize(l, l -> allocated / 2, flag);
+    }
     /* no empty space on the beggining */
     else if (l -> items[0] != NULL && flag == PREPEND) {
         handler = list_resize(l, 2 * l -> allocated, flag);
@@ -107,7 +102,7 @@ list_memHandler(List *l, int flag)
     }
     /* error? */
     if (handler < 0)
-        fprintf(stderr, "list_memHandler: error resizing list\n");
+        fprintf(stderr, "list_mem_handler: error resizing list\n");
     return handler;
     
 }
@@ -119,7 +114,7 @@ list_memHandler(List *l, int flag)
 int
 list_append(List *l, void *data, size_t dataSize) 
 {
-    if (list_memHandler(l, APPEND) < 0) {
+    if (list_mem_handler(l, APPEND) < 0) {
         fprintf(stderr, "list_append: error handling memory\n");
         return -1;
     }
@@ -137,7 +132,7 @@ list_append(List *l, void *data, size_t dataSize)
  */
 int list_prepend(List *l, void *data, size_t dataSize) 
 {
-    if (list_memHandler(l, PREPEND) < 0) {
+    if (list_mem_handler(l, PREPEND) < 0) {
         fprintf(stderr, "list_prepend: error handling memory\n");
         return -1;
     }
@@ -150,27 +145,7 @@ int list_prepend(List *l, void *data, size_t dataSize)
   
     return 0;
 }
-//
-///**
-// *  list_insert():
-// *      Inserts an item at the given index. Returns 0 if everything goes as
-// *      expected and 1 otherwise.
-// */
-//int list_insert(List *l, int i, void *data, size_t dataSize) {
-//    if (i > l -> n - 1) {
-//        fprintf(stderr, "list_insert: index out of range!\n");
-//        return -1;
-//    }
-//    /* inserting at the last index is equivalent to appending */
-//    else if (i == l -> n) return list_append(l, data, dataSize);
-//    /* inserting at the zero index is equivalent to prepending */
-//    else if (i == 0) return list_prepend(l, data, dataSize);
-//    /* otherwise, replace an existing value */
-//    else {
-//        memcpy(l -> items[i], data, dataSize);
-//        return 0;
-//    }
-//}
+
 static int
 index_handler(List *l, int i)
 {
@@ -225,17 +200,16 @@ list_set(List *l, int i, void *data, size_t dataSize)
 int
 list_del(List *l, int i) 
 {
-    // TODO: memhandler checar se precisa resize
+    // TODO: mem_handler checar se precisa resize
     i = index_handler(l, i);
     if (i < 0) {
         fprintf(stderr, "list_del: index out of range\n");
         return -1;
     }
+    printf("del %d\n", i);
     if (l -> items[i]) {
         free(l -> items[i]);
         l -> items[i] = NULL;
-        // printf("Address of pointer: %p\n", &l -> items[i]);
-        // printf("Address of where pointer is pointing: %p\n", l -> items[i]);
         // TODO: bug: garantir que todos os ponteiros vazios estão NULL de fato
         /* covers holes in the array */
         if (i < l -> zero + l -> n - 1 && l -> items[i + 1] != NULL) {
@@ -253,7 +227,7 @@ list_del(List *l, int i)
 int
 list_remove(List *l, void *data, int (compare)(void *, void *)) 
 {
-    // TODO: memhandler checar se precisa resize
+    // TODO: mem_handler checar se precisa resize
     for (int i = l -> zero; i < l -> zero + l -> n; i++)
         if (compare(data, l -> items[i]) == 0) {
             list_del(l, i - l -> zero);
@@ -276,25 +250,25 @@ list_is_empty(List *l)
     return (l -> n == 0);
 }
 
-#define list_append(l, data) list_append(l, data, sizeof(data))
-#define list_prepend(l, data) list_prepend(l, data, sizeof(data))
-// #define list_insert(l, i, data) list_append(l, i, data, sizeof(data))
-#define list_set(l, i, data) list_set(l, i, data, sizeof(data))
-
 int
 list_length(List *l)
 {
     return (l -> n);
 }
 
+// #define list_append(l, data) list_append(l, data, sizeof(data))
+// #define list_prepend(l, data) list_prepend(l, data, sizeof(data))
+// #define list_set(l, i, data) list_set(l, i, data, sizeof(data))
+
 int
 str_compare(void *a, void *b)
 {
     char *str_a = (char *) a;
     char *str_b = (char *) b;
-    return strcmp(a, b);
+    return strcmp(str_a, str_b);
 }
 
+/* Testes */
 int
 main(int argc, char **argv)
 {
@@ -302,14 +276,14 @@ main(int argc, char **argv)
     printf("--------- list_is_empty ----------\n");
     printf("%d\n", list_is_empty(l));
     printf("--------- list_append(\"teste2\") ----------\n");
-    list_append(l, "teste2");
+    list_append(l, "teste2", strlen("teste2"));
     for (int i = 0; i < list_length(l); i++) printf("%s\n", list_get(l, i));
     printf("--------- list_append(\"teste3\") ----------\n");
-    list_append(l, "teste3");
+    list_append(l, "teste3", strlen("teste3"));
     for (int i = 0; i < list_length(l); i++) printf("%s\n", list_get(l, i));
-    printf("--------- list_prepend(\"teste1\") ----------\n");
-    list_prepend(l, "teste1");
-    for (int i = 0; i < list_length(l); i++) printf("%s\n", list_get(l, i));
+    // printf("--------- list_prepend(\"teste1\") ----------\n");
+    // list_prepend(l, "teste1", strlen("teste1"));
+    // for (int i = 0; i < list_length(l); i++) printf("%s\n", list_get(l, i));
     printf("--------- list_contains ----------\n");
     char *str = list_get(l, 0);    
     printf("list_contains %s ? %d\n", str, list_contains(l, str, &str_compare));
@@ -324,8 +298,11 @@ main(int argc, char **argv)
     printf("--------- list_remove(\"teste1\") ----------\n");
     list_remove(l, "teste1", &str_compare);
     for (int i = 0; i < list_length(l); i++) printf("%s\n", list_get(l, i));
-    printf("--------- list_remove(\"teste3\") ----------\n");
-    list_remove(l, "teste3", &str_compare);
+    printf("--------- list_remove(\"teste2\") ----------\n");
+    list_remove(l, "teste2", &str_compare);
+    for (int i = 0; i < list_length(l); i++) printf("%s\n", list_get(l, i));
+    printf("--------- list_append(\"teste2\") ----------\n");
+    list_append(l, "teste2", strlen("teste2"));
     for (int i = 0; i < list_length(l); i++) printf("%s\n", list_get(l, i));
     return 0;
 }
