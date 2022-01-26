@@ -1,6 +1,3 @@
-/**
- * Includes & Macros
- */
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -11,10 +8,19 @@
 #undef socket_connect
 #undef socket_read
 #undef socket_write
+#undef socket_printf
 
-/**
- * Data Structures
- */
+#ifdef _WIN32
+    #include <alloc.h>
+    #define MALLOC_SIZE(x) _msize(x)
+#elif __APPLE__
+    #include <malloc/malloc.h>
+    #define MALLOC_SIZE(x) malloc_size(x)
+#else
+    #include <malloc.h>
+    #define MALLOC_SIZE(x) malloc_usable_size(x)
+#endif
+
 struct Socket {
     int sockfd, connfd;
     struct sockaddr_in servaddr, cliaddr;
@@ -22,14 +28,7 @@ struct Socket {
 };
 
 /**
- * socket_open(): abre uma porta TCP/UDP e retorna a Socket resultante
- * @port: porta que se deseja usar
- * @type: tipo de socket (TCP, UDP, ...)
- * @protocol: protocolo específico usado na conexão
- * @family: domínio da socket (AF_INET, ...)
- * @queue: número máximo de clientes que se deseja na porta
- *
- * @return: ponteiro para a struct recém criada
+ * Creates a struct Socket and returns a pointer to it
  */
 Socket *
 socket_open(int vargc, ...)
@@ -37,22 +36,21 @@ socket_open(int vargc, ...)
     /* parse va args */
     va_list vargp;
     va_start(vargp, vargc);
-    /* initialize with default values */
+    
     int port = 0,
         type = SOCK_STREAM,
         protocol = 0,
-        family = AF_INET,
         queue = 16;
-    /* assign custom values */
+    sa_family_t family = AF_INET;
+    /* assign custom values if present */
     for (int i = 0; i < vargc; i++) {
         if (i == 0) port = va_arg(vargp, int);
         else if (i == 1) type = va_arg(vargp, int);
         else if (i == 2) protocol = va_arg(vargp, int);
-        else if (i == 3) family = va_arg(vargp, int);
+        else if (i == 3) family = (sa_family_t) va_arg(vargp, int);
         else if (i == 4) queue = va_arg(vargp, int);
     }
     va_end(vargp);
-//    printf("port %d\ntype %d\nprotocol %d\nfamily %d\nqueue %d\n", port, type, protocol, family, queue);
 
     /* init */
     Socket *s = (Socket *) malloc(sizeof(Socket));
@@ -60,88 +58,72 @@ socket_open(int vargc, ...)
         fprintf(stderr, "socket_open: malloc error\n");
         return NULL;
     }
-    /* Salva parâmetros iniciais que não serão salvos em outras EDs */
+    memset(s, 0, sizeof(Socket));
     s -> type = type;
     s -> protocol = protocol;
 
-    /* Criação de um socket */
-    if ((s -> sockfd = socket(family, type, protocol)) == -1) {
+    if ((s -> sockfd = socket(family, type, protocol)) == - 1) {
         fprintf(stderr, "socket_open: cannot create new socket\n");
-        // TODO: quit
         return NULL;
     }
 
-    /* Configuração da struct sockaddr_in */
-    bzero(&s -> servaddr, sizeof(struct sockaddr_in));
     s -> servaddr.sin_family      = family;
     s -> servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
     s -> servaddr.sin_port        = htons(port);
 
-    /* Bind da porta */
-    if (bind(s -> sockfd, (struct sockaddr *) &s -> servaddr, sizeof(struct sockaddr_in)) == -1) {
+    if (bind(s -> sockfd, (struct sockaddr *) &s -> servaddr,
+             sizeof(struct sockaddr_in)) == - 1) {
         fprintf(stderr, "socket_open: cannot bind new socket\n");
         return NULL;
     }
 
-    /* Orientado a conexão: precisa chamar a função listen */
+    /* connection-oriented protocols need to call listen() */
     if (type == SOCK_STREAM || type == SOCK_SEQPACKET) {
-        if (listen(s -> sockfd, queue) == -1) {
+        if (listen(s -> sockfd, queue) == - 1) {
             fprintf(stderr, "socket_open: cannot listen new socket\n");
             return NULL;
         }
     }
-    
-    /* porta aleatória */
-    if (port == 0) printf("listening at port %d...\n", socket_port(s));
-    
     return s;
 }
 
 /**
- * socket_await(): aguarda conexão do cliente - blocking call
- * @s: ponteiro para o socket que será lido
- *
- * @return: file descriptor para a nova conexão aberta
+ * Opens a TCP connection on given socket (blocking call)
+ * return: file descriptor int for the recently accepted connection
  */
 int
-socket_await(Socket *s)
+socket_accept(Socket *s)
 {
-    /* Orientado à mensagem: não precisa de accept, retorna -1 */
-    if (!(s -> type == SOCK_STREAM || s -> type == SOCK_SEQPACKET)) return -1;
-    /* Orientado a conexão: precisa chamar a função listen e accept */
+    if (!(s -> type == SOCK_STREAM || s -> type == SOCK_SEQPACKET)) return - 1;
+    
     if (s -> type == SOCK_STREAM || s -> type == SOCK_SEQPACKET) {
         unsigned int len = sizeof(s -> cliaddr);
-        if ((s -> connfd = accept(s -> sockfd, (struct sockaddr *) &s -> cliaddr, &len)) == -1) {
-            fprintf(stderr, "socket_read: cannot accept on new socket\n");
-            return -1;
+        if ((s -> connfd = accept(s -> sockfd,
+                                  (struct sockaddr *) &s -> cliaddr,
+                                  &len)) == - 1) {
+            fprintf(stderr, "socket_accept: cannot accept connection\n");
+            return - 1;
         }
-        else return s -> connfd;
+        return s -> connfd;
     }
-    
-    else return -1;
+    return - 1;
 }
 
 /**
- * socket_read(): tenta ler mensagens e retorna no buffer
- * @s: ponteiro para o socket que será lido
- * @buffer: espaço na memória onde será escrita a mensagem
- * @buffersize: tamanho máximo da mensagem
- * @flags: flags para a system call recv
- *
- * @return: número de bytes lidos
+ * Tries to read the socket and copy data to given buffer
+ * return: number of bytes read.
  */
-int
+ssize_t
 socket_read(int vargc, ...)
 {
-    if (vargc < 2) fprintf(stderr, "socket_read(): not enough args!");
+    if (vargc < 2) fprintf(stderr, "socket_read: not enough args!");
     /* parse va args */
     va_list vargp;
     va_start(vargp, vargc);
-    /* initialize with default values */
+    
     struct Socket *s = NULL;
     void *buffer = NULL;
-	size_t buffersize = 0;
-	// TODO: Linux malloc_usable_size
+    size_t buffersize = 0;
     int flags = 0;
     /* assign custom values */
     for (int i = 0; i < vargc; i++) {
@@ -151,119 +133,104 @@ socket_read(int vargc, ...)
         else if (i == 3) flags = va_arg(vargp, int);
     }
     va_end(vargp);
-	/* attempt to determine buffersize */
-	if (!buffersize) buffersize = malloc_size(buffer);
-	if (!buffersize) buffersize = strlen(buffer);
-//    printf("recv: buffer %s\nbuffersize %zu\nflags %d\n", buffer, buffersize, flags);
-	
-    /* Zera o buffer e lê a mensagem se houver */
+    /* attempts to determine buffersize */
+    if (!buffersize) buffersize = MALLOC_SIZE(buffer);
+    if (!buffersize) {
+        fprintf(stderr, "socket_read: cannot determine buffer size\n");
+        return 0;
+    }
+
+    /* wipes buffer clean before reading */
     memset(buffer, 0, buffersize);
-    
-    return recv(s -> connfd, buffer, buffersize, flags);
+    /* server -> client */
+    if (s -> connfd) return recv(s -> connfd, buffer, buffersize, flags);
+    /* client -> server */
+    else return recv(s -> sockfd, buffer, buffersize, flags);
 }
 
 /**
- * socket_port(): busca o número da porta do socket
- * @s: socket o qual se deseja fechar
- *
- * @return: numero da porta
+ * Returns Socket's port number
  */
 int
 socket_port(Socket *s)
 {
     struct sockaddr_in sin;
     socklen_t len = sizeof(sin);
-    if (getsockname(s -> sockfd, (struct sockaddr *)&sin, &len) != -1)
+    if (getsockname(s -> sockfd, (struct sockaddr *)&sin, &len) != - 1)
         return ntohs(sin.sin_port);
-    return 0;
+    return - 1;
 }
 
 /**
- * socket_connect(): conecta a um servidor
- * @address: endereço IP ao qual se deseja conectar
- * @port: porta do processoa o qual se deseja conectar
- * @type: tipo de socket (TCP, UDP, ...)
- * @protocol: protocolo específico usado na conexão
- * @family: domínio da socket (AF_INET, ...)
- *
- * @return: ponteiro para a struct recém criada
+ * Attempts to connect to a remote server
  */
 Socket *
 socket_connect(int vargc, ...)
 {
-    if (vargc < 2) fprintf(stderr, "socket_connect(): not enough args!");
+    if (vargc < 2) fprintf(stderr, "socket_connect: not enough args!");
     /* parse va args */
     va_list vargp;
     va_start(vargp, vargc);
-    /* initialize with default values */
-    char *address = "127.0.0.1";
+    
+    char *address = NULL;
     int port = 0,
         type = SOCK_STREAM,
-        protocol = 0,
-        family = AF_INET;
+        protocol = 0;
+    sa_family_t family = AF_INET;
     /* assign custom values */
     for (int i = 0; i < vargc; i++) {
         if (i == 0) address = va_arg(vargp, char *);
         else if (i == 1) port = va_arg(vargp, int);
         else if (i == 2) type = va_arg(vargp, int);
         else if (i == 3) protocol = va_arg(vargp, int);
-        else if (i == 4) family = va_arg(vargp, int);
+        else if (i == 4) family = (sa_family_t) va_arg(vargp, int);
     }
     va_end(vargp);
-//    printf("address %s\nport %d\ntype %d\nprotocol %d\nfamily %d\n", address, port, type, protocol, family);
-    
+
     /* init */
     Socket *s = (Socket *) malloc(sizeof(Socket));
     if (!s) {
         fprintf(stderr, "socket_connect: malloc error\n");
         return NULL;
     }
-    /* Salva parâmetros iniciais que não serão salvos em outras EDs */
+    memset(s, 0, sizeof(Socket));
     s -> type = type;
     s -> protocol = protocol;
-    
-    /* Criação de um socket */
-    if ((s -> sockfd = socket(family, type, protocol)) == -1) {
+
+    if ((s -> sockfd = socket(family, type, protocol)) == - 1) {
         fprintf(stderr, "socket_connect: cannot create new socket\n");
         return NULL;
     }
-    
-    /* Configuração da struct sockaddr_in */
-    bzero(&s -> servaddr, sizeof(struct sockaddr_in));
+
     s -> servaddr.sin_family      = family;
     s -> servaddr.sin_addr.s_addr = inet_addr(address);
     s -> servaddr.sin_port        = htons(port);
-    
-    /* Tenta conectar ao servidor */
-    if (connect(s -> sockfd, (struct sockaddr *) &s -> servaddr, sizeof(struct sockaddr_in)) != 0) {
+
+    /* attempts to connect to remote server */
+    if (connect(s -> sockfd, (struct sockaddr *) &s -> servaddr,
+                sizeof(struct sockaddr_in)) != 0) {
         fprintf(stderr, "socket_connect: cannot connect to server\n");
         return NULL;
     }
-    
+
     return s;
 }
 
 /**
- * socket_write(): tenta escrever no socket
- * @s: ponteiro para o socket no qual será escrita a mensagem
- * @buffer: ponteiro para a mensagem
- * @buffersize: tamanho da mensagem
- * @flags: flags opcionais para a chamada send
- *
- * @return: número de bytes escritos
+ * Writes given message on given socket
+ * return: number of bytes written
  */
-int
+ssize_t
 socket_write(int vargc, ...)
 {
-    if (vargc < 2) fprintf(stderr, "socket_write(): not enough args!");
+    if (vargc < 2) fprintf(stderr, "socket_write: not enough args!");
     /* parse va args */
     va_list vargp;
     va_start(vargp, vargc);
-    /* initialize with default values */
+    
     struct Socket *s = NULL;
     void *buffer = NULL;
-	size_t buffersize = 0;
-	// TODO: Linux malloc_usable_size
+    size_t buffersize = 0;
     int flags = 0;
     /* assign custom values */
     for (int i = 0; i < vargc; i++) {
@@ -273,50 +240,86 @@ socket_write(int vargc, ...)
         else if (i == 3) flags = va_arg(vargp, int);
     }
     va_end(vargp);
-	/* attempt to determine buffersize */
-	if (!buffersize) buffersize = malloc_size(buffer);
-	if (!buffersize) buffersize = strlen(buffer);
-//    printf("send: buffer %s\nbuffersize %zu\nflags %d\n", buffer, buffersize, flags);
-    return send(s -> sockfd, buffer, buffersize, flags);
+    /* attempts to determine buffersize */
+    if (!buffersize) buffersize = MALLOC_SIZE(buffer);
+    if (!buffersize) {
+        fprintf(stderr, "socket_write: cannot determine message length\n");
+        return 0;
+    }
+    /* server -> client */
+    if (s -> connfd) return send(s -> connfd, buffer, buffersize, flags);
+    /* client -> server */
+    else return send(s -> sockfd, buffer, buffersize, flags);
 }
 
 /**
- * socket_close(): fecha o socket e libera memória
- * @s: socket o qual se deseja fechar
+ * Writes formatted message on given socket
+ * return: number of bytes written
+ */
+ssize_t
+socket_printf(Socket *s, char *fmsg, ...)
+{
+    /* parse va args */
+    va_list vargp;
+    va_start(vargp, fmsg);
+    ssize_t n = vsnprintf(NULL, 0, fmsg, vargp);
+    va_end(vargp);
+    
+    if (n >= 0) {
+        va_start(vargp, fmsg);
+        char *buffer = malloc(n + 1);
+        if (!buffer) {
+            fprintf(stderr, "socket_printf: cannot malloc buffer\n");
+            return 0;
+        }
+        vsnprintf(buffer, n + 1, fmsg, vargp);
+        va_end(vargp);
+        ssize_t bytes_written = socket_write(3, s, buffer, strlen(buffer));
+        free(buffer);
+        return bytes_written;
+    }
+    return socket_write(3, s, fmsg, strlen(fmsg));
+}
+
+/**
+ * Returns IPv4 address of client in printable format
+ */
+char *
+socket_client_ip(Socket *s)
+{
+    return inet_ntoa(s -> cliaddr.sin_addr);
+}
+
+/**
+ * Returns IPv4 address of server in printable format
+ */
+char *
+socket_server_ip(Socket *s)
+{
+    struct sockaddr_in local_address;
+    socklen_t address_length = sizeof(local_address);;
+    getsockname(s -> connfd, (struct sockaddr*) &local_address, &address_length);
+
+    return inet_ntoa(local_address.sin_addr);
+}
+
+/**
+ * Closes socket and frees malloc'd memory
  */
 void
 socket_close(Socket *s)
 {
+    shutdown(s -> sockfd, SHUT_RDWR);
     close(s -> sockfd);
     free(s);
 }
 
 /**
- * socket_test(): testa essa abstração
- * @return: 0 para sucesso e 1 para erro
+ * Closes current connection
  */
-int
-socket_test()
+void
+socket_finish(Socket *s)
 {
-//    int pid = fork();
-//
-//    /* filho */
-//    if (pid == 0) {
-//        Socket *c = socket_connect(AF_INET, SOCK_STREAM, 0, "127.0.0.1", 7922);
-//        socket_write(c, "sucesso", 8, 0);
-//        socket_close(c);
-//    }
-//
-//    /* pai */
-//    else {
-//        printf("socket_test():");
-//        Socket *s = socket_open(AF_INET, SOCK_STREAM, 0, 7922, 16);
-//        socket_await(s);
-//        char buffer[16];
-//        socket_read(s, buffer, 16, 0);
-//        printf(" %s\n", buffer);
-//        socket_close(s);
-//        return 0;
-//    }
-    return 0;
+    shutdown(s -> connfd, SHUT_RDWR);
+    close(s -> connfd);
 }
